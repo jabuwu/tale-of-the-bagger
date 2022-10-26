@@ -3,6 +3,7 @@ use std::io::Cursor;
 use bevy::{prelude::*, window::WindowId, winit::WinitWindows};
 use bevy_kira_audio::AudioPlugin;
 use bevy_spine::prelude::*;
+use common::CommonPlugins;
 use winit::window::Icon;
 
 use crate::{game::GamePlugin, loading::LoadingPlugin};
@@ -24,6 +25,7 @@ pub fn game() {
         .init_resource::<AssetLibrary>()
         .add_state(AppState::default())
         .add_plugins(DefaultPlugins)
+        .add_plugins(CommonPlugins)
         .add_plugin(AudioPlugin)
         .add_plugin(SpinePlugin)
         .add_plugin(LoadingPlugin)

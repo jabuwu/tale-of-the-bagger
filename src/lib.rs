@@ -2,6 +2,7 @@ use std::io::Cursor;
 
 use bevy::{prelude::*, window::WindowId, winit::WinitWindows};
 use bevy_kira_audio::{Audio, AudioControl, AudioPlugin};
+use bevy_spine::prelude::*;
 use winit::window::Icon;
 
 pub fn game() {
@@ -18,8 +19,10 @@ pub fn game() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(AudioPlugin)
+        .add_plugin(SpinePlugin)
         .add_startup_system(set_window_icon)
         .add_startup_system(setup)
+        .add_system(desk_spawned)
         .run();
 }
 
@@ -36,7 +39,12 @@ fn set_window_icon(windows: NonSend<WinitWindows>) {
     };
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>, audio: Res<Audio>) {
+fn setup(
+    mut commands: Commands,
+    mut skeletons: ResMut<Assets<SkeletonData>>,
+    asset_server: Res<AssetServer>,
+    audio: Res<Audio>,
+) {
     commands.spawn_bundle(Camera2dBundle::default());
 
     commands.spawn_bundle(SpriteBundle {
@@ -51,4 +59,29 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, audio: Res<Audi
     });
 
     audio.play(asset_server.load("audio/ambience.ogg")).looped();
+
+    let skeleton = SkeletonData::new_from_json(
+        asset_server.load("spines/desk/skeleton.json"),
+        asset_server.load("spines/desk/skeleton.atlas"),
+    );
+    let skeleton_handle = skeletons.add(skeleton);
+
+    commands.spawn_bundle(SpineBundle {
+        skeleton: skeleton_handle.clone(),
+        transform: Transform::from_xyz(-105., -256.5, 0.2).with_scale(Vec3::splat(0.75)),
+        ..Default::default()
+    });
+}
+
+fn desk_spawned(
+    mut spine_ready_event: EventReader<SpineReadyEvent>,
+    mut spine_query: Query<&mut Spine>,
+) {
+    for event in spine_ready_event.iter() {
+        if let Ok(mut spine) = spine_query.get_mut(event.entity) {
+            let _ = spine
+                .animation_state
+                .set_animation_by_name(0, "conveyor", true);
+        }
+    }
 }

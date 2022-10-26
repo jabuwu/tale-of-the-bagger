@@ -627,6 +627,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_spine"
+version = "0.2.0"
+source = "git+https://github.com/jabuwu/bevy_spine?rev=1065a3fd0289b5ed8bed02162d20153ccd147cd2#1065a3fd0289b5ed8bed02162d20153ccd147cd2"
+dependencies = [
+ "bevy",
+ "glam",
+ "rusty_spine",
+]
+
+[[package]]
 name = "bevy_sprite"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1433,6 +1443,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "518faa5064866338b013ff9b2350dc318e14cc4fcd6cb8206d7e7c9886c98815"
 dependencies = [
  "bytemuck",
+ "mint",
  "serde",
 ]
 
@@ -1848,6 +1859,12 @@ checksum = "6f5c75688da582b8ffc1f1799e9db273f32133c49e048f614d22ec3256773ccc"
 dependencies = [
  "adler",
 ]
+
+[[package]]
+name = "mint"
+version = "0.5.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e53debba6bda7a793e5f99b8dacf19e626084f525f7829104ba9898f367d85ff"
 
 [[package]]
 name = "mio"
@@ -2410,6 +2427,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "rusty_spine"
+version = "0.3.1"
+source = "git+https://github.com/jabuwu/rusty_spine?rev=9136c7b2ed46aac00dbfb3b9b6c75e7122bbd085#9136c7b2ed46aac00dbfb3b9b6c75e7122bbd085"
+dependencies = [
+ "mint",
+]
+
+[[package]]
 name = "ryu"
 version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2638,6 +2663,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_kira_audio",
+ "bevy_spine",
  "embed-resource",
  "image",
  "rand",

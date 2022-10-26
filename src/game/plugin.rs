@@ -1,19 +1,26 @@
 use bevy::prelude::*;
 use bevy_kira_audio::{Audio, AudioControl};
-use bevy_spine::prelude::*;
 
 use crate::{AppState, AssetLibrary};
+
+use super::{ConveyorPlugin, DeskPlugin, DeskSpawnEvent};
 
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter))
-            .add_system(desk_spawned);
+        app.add_plugin(DeskPlugin)
+            .add_plugin(ConveyorPlugin)
+            .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter));
     }
 }
 
-fn game_enter(mut commands: Commands, asset_library: Res<AssetLibrary>, audio: Res<Audio>) {
+fn game_enter(
+    mut commands: Commands,
+    mut desk_spawn_events: EventWriter<DeskSpawnEvent>,
+    asset_library: Res<AssetLibrary>,
+    audio: Res<Audio>,
+) {
     commands.spawn_bundle(Camera2dBundle::default());
 
     commands.spawn_bundle(SpriteBundle {
@@ -32,22 +39,5 @@ fn game_enter(mut commands: Commands, asset_library: Res<AssetLibrary>, audio: R
         .play(asset_library.audio.radio_tune_1.clone())
         .looped();
 
-    commands.spawn_bundle(SpineBundle {
-        skeleton: asset_library.spines.desk.clone(),
-        transform: Transform::from_xyz(-105., -256.5, 0.2).with_scale(Vec3::splat(0.75)),
-        ..Default::default()
-    });
-}
-
-fn desk_spawned(
-    mut spine_ready_event: EventReader<SpineReadyEvent>,
-    mut spine_query: Query<&mut Spine>,
-) {
-    for event in spine_ready_event.iter() {
-        if let Ok(mut spine) = spine_query.get_mut(event.entity) {
-            let _ = spine
-                .animation_state
-                .set_animation_by_name(0, "conveyor", true);
-        }
-    }
+    desk_spawn_events.send_default();
 }

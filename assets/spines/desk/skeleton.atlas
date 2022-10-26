@@ -1,0 +1,9 @@
+skeleton.png
+size:1653,560
+filter:Linear,Linear
+pma:true
+conveyor
+bounds:2,2,1612,161
+desk
+bounds:2,165,1649,393
+offsets:0,0,1654,401

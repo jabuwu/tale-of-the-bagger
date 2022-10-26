@@ -4,8 +4,8 @@ use bevy_kira_audio::{Audio, AudioControl};
 use crate::{common::Transform2, AppState, AssetLibrary};
 
 use super::{
-    BagPlugin, BagSpawnEvent, ConveyorPlugin, DeskPlugin, DeskSpawnEvent, DEPTH_BACKGROUND,
-    DEPTH_BACKGROUND_FRONT,
+    BagPlugin, BagSpawnEvent, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent, DeskPlugin,
+    DeskSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
 };
 
 pub struct GamePlugin;
@@ -15,7 +15,9 @@ impl Plugin for GamePlugin {
         app.add_plugin(DeskPlugin)
             .add_plugin(ConveyorPlugin)
             .add_plugin(BagPlugin)
-            .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter));
+            .add_plugin(CustomerPlugin)
+            .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter))
+            .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_customers));
     }
 }
 
@@ -62,4 +64,24 @@ fn game_enter(
         position: Vec2::new(290., -190.),
         ..Default::default()
     });
+}
+
+#[derive(Default)]
+struct GameSpawnCustomersLocal {
+    spawn_time: f32,
+}
+
+fn game_spawn_customers(
+    mut customer_spawn_events: EventWriter<CustomerSpawnEvent>,
+    mut local: Local<GameSpawnCustomersLocal>,
+    time: Res<Time>,
+) {
+    local.spawn_time -= time.delta_seconds();
+    if local.spawn_time <= 0. {
+        customer_spawn_events.send(CustomerSpawnEvent {
+            position: Vec2::new(-800., -100.),
+            ..Default::default()
+        });
+        local.spawn_time = 17.;
+    }
 }

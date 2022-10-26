@@ -37,6 +37,8 @@ pub struct SpineAssets {
     pub desk: Handle<SkeletonData>,
     #[spine_asset("spines/bag")]
     pub bag: Handle<SkeletonData>,
+    #[spine_asset("spines/customer")]
+    pub customer: Handle<SkeletonData>,
 }
 
 #[derive(Default, AssetCollection)]

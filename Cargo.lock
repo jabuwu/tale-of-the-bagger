@@ -2667,7 +2667,17 @@ dependencies = [
  "embed-resource",
  "image",
  "rand",
+ "tale-of-the-bagger-macros",
  "winit",
+]
+
+[[package]]
+name = "tale-of-the-bagger-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

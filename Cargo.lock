@@ -629,7 +629,7 @@ dependencies = [
 [[package]]
 name = "bevy_spine"
 version = "0.2.0"
-source = "git+https://github.com/jabuwu/bevy_spine?rev=1065a3fd0289b5ed8bed02162d20153ccd147cd2#1065a3fd0289b5ed8bed02162d20153ccd147cd2"
+source = "git+https://github.com/jabuwu/bevy_spine?rev=f50a65e048f12297929dc708128dfb77f1bfb4d9#f50a65e048f12297929dc708128dfb77f1bfb4d9"
 dependencies = [
  "bevy",
  "glam",
@@ -1755,6 +1755,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
+name = "lerp"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b19ac50d419bff1a024a8eb8034bfbee6c1cf8fa3472502f6bd3def327b09e4c"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.132"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2666,6 +2675,7 @@ dependencies = [
  "bevy_spine",
  "embed-resource",
  "image",
+ "lerp",
  "rand",
  "tale-of-the-bagger-macros",
  "winit",

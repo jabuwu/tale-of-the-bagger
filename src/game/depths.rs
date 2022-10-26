@@ -1,0 +1,5 @@
+use crate::common::DepthLayer;
+
+pub const DEPTH_BACKGROUND: DepthLayer = DepthLayer::Background(0.);
+pub const DEPTH_BACKGROUND_FRONT: DepthLayer = DepthLayer::Background(0.1);
+pub const DEPTH_DESK: DepthLayer = DepthLayer::Foreground(0.);

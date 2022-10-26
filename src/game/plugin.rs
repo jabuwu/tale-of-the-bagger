@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 use bevy_kira_audio::{Audio, AudioControl};
 
-use crate::{AppState, AssetLibrary};
+use crate::{common::Transform2, AppState, AssetLibrary};
 
-use super::{ConveyorPlugin, DeskPlugin, DeskSpawnEvent};
+use super::{ConveyorPlugin, DeskPlugin, DeskSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT};
 
 pub struct GamePlugin;
 
@@ -23,16 +23,20 @@ fn game_enter(
 ) {
     commands.spawn_bundle(Camera2dBundle::default());
 
-    commands.spawn_bundle(SpriteBundle {
-        texture: asset_library.textures.background.clone(),
-        transform: Transform::from_xyz(0., 0., 0.).with_scale(Vec3::splat(0.75)),
-        ..Default::default()
-    });
-    commands.spawn_bundle(SpriteBundle {
-        texture: asset_library.textures.background_front.clone(),
-        transform: Transform::from_xyz(0., 0., 0.1).with_scale(Vec3::splat(0.75)),
-        ..Default::default()
-    });
+    commands
+        .spawn_bundle(SpriteBundle {
+            texture: asset_library.textures.background.clone(),
+            ..Default::default()
+        })
+        .insert(Transform2::from_xy(0., 0.).with_scale(Vec2::splat(0.75)))
+        .insert(DEPTH_BACKGROUND);
+    commands
+        .spawn_bundle(SpriteBundle {
+            texture: asset_library.textures.background_front.clone(),
+            ..Default::default()
+        })
+        .insert(Transform2::from_xy(0., 0.).with_scale(Vec2::splat(0.75)))
+        .insert(DEPTH_BACKGROUND_FRONT);
 
     audio.play(asset_library.audio.ambience.clone()).looped();
     audio

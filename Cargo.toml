@@ -25,7 +25,8 @@ dev = [
 bevy = { version = "0.8", default-features = false, features = ["bevy_asset", "bevy_winit", "render", "png", "x11"] }
 bevy_kira_audio = { version = "0.12" }
 rand = { version = "0.8.3" }
-bevy_spine = { git = "https://github.com/jabuwu/bevy_spine", rev = "1065a3fd0289b5ed8bed02162d20153ccd147cd2" }
+lerp = { version = "0.4" }
+bevy_spine = { git = "https://github.com/jabuwu/bevy_spine", rev = "f50a65e048f12297929dc708128dfb77f1bfb4d9" }
 
 tale-of-the-bagger-macros = { path = "./macros" }
 

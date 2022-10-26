@@ -35,6 +35,8 @@ pub struct TextureAssets {
 pub struct SpineAssets {
     #[spine_asset("spines/desk")]
     pub desk: Handle<SkeletonData>,
+    #[spine_asset("spines/bag")]
+    pub bag: Handle<SkeletonData>,
 }
 
 #[derive(Default, AssetCollection)]

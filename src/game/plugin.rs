@@ -3,7 +3,10 @@ use bevy_kira_audio::{Audio, AudioControl};
 
 use crate::{common::Transform2, AppState, AssetLibrary};
 
-use super::{ConveyorPlugin, DeskPlugin, DeskSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT};
+use super::{
+    BagPlugin, BagSpawnEvent, ConveyorPlugin, DeskPlugin, DeskSpawnEvent, DEPTH_BACKGROUND,
+    DEPTH_BACKGROUND_FRONT,
+};
 
 pub struct GamePlugin;
 
@@ -11,6 +14,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(DeskPlugin)
             .add_plugin(ConveyorPlugin)
+            .add_plugin(BagPlugin)
             .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter));
     }
 }
@@ -18,6 +22,7 @@ impl Plugin for GamePlugin {
 fn game_enter(
     mut commands: Commands,
     mut desk_spawn_events: EventWriter<DeskSpawnEvent>,
+    mut bag_spawn_events: EventWriter<BagSpawnEvent>,
     asset_library: Res<AssetLibrary>,
     audio: Res<Audio>,
 ) {
@@ -44,4 +49,17 @@ fn game_enter(
         .looped();
 
     desk_spawn_events.send_default();
+
+    bag_spawn_events.send(BagSpawnEvent {
+        position: Vec2::new(-525., -190.),
+        ..Default::default()
+    });
+    bag_spawn_events.send(BagSpawnEvent {
+        position: Vec2::new(-120., -190.),
+        ..Default::default()
+    });
+    bag_spawn_events.send(BagSpawnEvent {
+        position: Vec2::new(290., -190.),
+        ..Default::default()
+    });
 }

@@ -52,11 +52,17 @@ fn desk_spawn(
     }
 }
 
-fn desk_spawned(mut spine_ready_event: EventReader<SpineReadyEvent>, mut commands: Commands) {
+fn desk_spawned(
+    mut spine_ready_event: EventReader<SpineReadyEvent>,
+    mut commands: Commands,
+    desk_query: Query<&Desk>,
+) {
     for event in spine_ready_event.iter() {
-        commands
-            .entity(*event.bones.get("conveyor").unwrap())
-            .insert(Conveyor::default())
-            .insert(Transform2::default());
+        if desk_query.contains(event.entity) {
+            commands
+                .entity(*event.bones.get("conveyor").unwrap())
+                .insert(Conveyor::default())
+                .insert(Transform2::default());
+        }
     }
 }

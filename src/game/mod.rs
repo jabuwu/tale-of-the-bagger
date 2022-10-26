@@ -2,10 +2,10 @@ mod bag;
 mod conveyor;
 mod depths;
 mod desk;
-mod plugin;
+mod game;
 
 pub use bag::*;
 pub use conveyor::*;
 pub use depths::*;
 pub use desk::*;
-pub use plugin::*;
+pub use game::*;

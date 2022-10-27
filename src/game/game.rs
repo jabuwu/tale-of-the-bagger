@@ -48,9 +48,10 @@ fn game_enter(
         .insert(DEPTH_BACKGROUND_FRONT);
 
     audio.play(asset_library.audio.ambience.clone()).looped();
-    /*audio
-    .play(asset_library.audio.radio_tune_1.clone())
-    .looped();*/
+    #[cfg(not(feature = "dev"))]
+    audio
+        .play(asset_library.audio.radio_tune_1.clone())
+        .looped();
 
     desk_spawn_events.send_default();
 

@@ -17,6 +17,7 @@ pub enum BagSystem {
     Update,
     Hover,
     ProductDrop,
+    Clear,
 }
 
 pub struct BagPlugin;
@@ -40,6 +41,11 @@ impl Plugin for BagPlugin {
                 bag_product_drop
                     .label(BagSystem::ProductDrop)
                     .after(ProductSystem::Drag),
+            )
+            .add_system(
+                bag_clear
+                    .label(BagSystem::Clear)
+                    .after(BagSystem::ProductDrop),
             );
     }
 }
@@ -51,7 +57,12 @@ pub struct BagSpawnEvent {
 
 #[derive(Default, Component)]
 pub struct Bag {
-    slots: Vec<Entity>,
+    slots: Vec<BagSlot>,
+}
+
+pub struct BagSlot {
+    slot_entity: Entity,
+    product_entity: Option<Entity>,
 }
 
 fn bag_spawn(
@@ -102,7 +113,10 @@ fn bag_spawned(
             }
             for slot_name in ["slot1", "slot2", "slot3"].into_iter() {
                 let slot_entity = *event.bones.get(slot_name).unwrap();
-                bag.slots.push(slot_entity);
+                bag.slots.push(BagSlot {
+                    slot_entity,
+                    product_entity: None,
+                });
             }
         }
     }
@@ -115,7 +129,7 @@ fn bag_update(
     for (mut bag_spine, bag_interactable) in bag_query.iter_mut() {
         *bag_spine.skeleton.find_slot_mut("bag").unwrap().color_mut() =
             if bag_interactable.hovered(game_input.as_ref()) {
-                bevy_spine::Color::new_rgba(1., 0., 0., 1.)
+                bevy_spine::Color::new_rgba(1.3, 1.3, 1.3, 1.)
             } else {
                 bevy_spine::Color::new_rgba(1., 1., 1., 1.)
             };
@@ -136,36 +150,83 @@ fn bag_product_drop(
         {
             for (mut bag, mut bag_spine, bag_interactable) in bag_query.iter_mut() {
                 if bag_interactable.contains_point(event.position) {
-                    if bag.slots.len() > 0 {
-                        let _ =
-                            bag_spine
-                                .animation_state
-                                .set_animation_by_name(0, "animation", false);
-                        commands.entity(product_entity).remove::<ConveyorItem>();
-                        commands.entity(bag.slots[0]).add_child(product_entity);
-                        bag.slots.remove(0);
-                        product_transform.translation = Vec2::ZERO;
-                        audio.play(
-                            [
-                                asset_library.audio.bag_insert_1.clone(),
-                                asset_library.audio.bag_insert_2.clone(),
-                                asset_library.audio.bag_insert_3.clone(),
-                                asset_library.audio.bag_insert_4.clone(),
-                                asset_library.audio.bag_insert_5.clone(),
-                                asset_library.audio.bag_insert_6.clone(),
-                                asset_library.audio.bag_insert_7.clone(),
-                                asset_library.audio.bag_insert_8.clone(),
-                                asset_library.audio.bag_insert_9.clone(),
-                                asset_library.audio.bag_insert_10.clone(),
-                                asset_library.audio.bag_insert_11.clone(),
-                            ]
-                            .choose(&mut thread_rng())
-                            .unwrap()
-                            .clone(),
-                        );
+                    for slot in bag.slots.iter_mut() {
+                        if slot.product_entity.is_none() {
+                            let _ = bag_spine.animation_state.set_animation_by_name(
+                                0,
+                                "animation",
+                                false,
+                            );
+                            commands.entity(product_entity).remove::<ConveyorItem>();
+                            commands.entity(slot.slot_entity).add_child(product_entity);
+                            product_transform.translation = Vec2::ZERO;
+                            slot.product_entity = Some(product_entity);
+                            audio.play(
+                                [
+                                    asset_library.audio.bag_insert_1.clone(),
+                                    asset_library.audio.bag_insert_2.clone(),
+                                    asset_library.audio.bag_insert_3.clone(),
+                                    asset_library.audio.bag_insert_4.clone(),
+                                    asset_library.audio.bag_insert_5.clone(),
+                                    asset_library.audio.bag_insert_6.clone(),
+                                    asset_library.audio.bag_insert_7.clone(),
+                                    asset_library.audio.bag_insert_8.clone(),
+                                    asset_library.audio.bag_insert_9.clone(),
+                                    asset_library.audio.bag_insert_10.clone(),
+                                    asset_library.audio.bag_insert_11.clone(),
+                                ]
+                                .choose(&mut thread_rng())
+                                .unwrap()
+                                .clone(),
+                            );
+                            break;
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+#[derive(Default)]
+struct BagClearLocal {
+    audio_track: usize,
+}
+
+fn bag_clear(
+    mut bag_query: Query<&mut Bag>,
+    mut commands: Commands,
+    mut local: Local<BagClearLocal>,
+    asset_library: Res<AssetLibrary>,
+    audio: Res<Audio>,
+) {
+    for mut bag in bag_query.iter_mut() {
+        if bag.slots.len() > 0
+            && bag
+                .slots
+                .get(bag.slots.len() - 1)
+                .unwrap()
+                .product_entity
+                .is_some()
+        {
+            for slot in bag.slots.iter_mut() {
+                if let Some(product_entity) = slot.product_entity {
+                    commands.entity(product_entity).despawn_recursive();
+                }
+                slot.product_entity = None;
+            }
+            audio.play(
+                [
+                    asset_library.audio.bag_clear_success_1.clone(),
+                    asset_library.audio.bag_clear_success_2.clone(),
+                    asset_library.audio.bag_clear_success_3.clone(),
+                ]
+                .into_iter()
+                .nth(local.audio_track)
+                .unwrap()
+                .clone(),
+            );
+            local.audio_track = (local.audio_track + 1) % 3;
         }
     }
 }

@@ -98,4 +98,11 @@ pub struct AudioAssets {
     pub bag_insert_10: Handle<AudioSource>,
     #[asset("audio/bag_insert_11.ogg")]
     pub bag_insert_11: Handle<AudioSource>,
+
+    #[asset("audio/bag_clear_success_1.ogg")]
+    pub bag_clear_success_1: Handle<AudioSource>,
+    #[asset("audio/bag_clear_success_2.ogg")]
+    pub bag_clear_success_2: Handle<AudioSource>,
+    #[asset("audio/bag_clear_success_3.ogg")]
+    pub bag_clear_success_3: Handle<AudioSource>,
 }

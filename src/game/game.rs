@@ -104,6 +104,6 @@ fn game_spawn_products(
             entity: commands.spawn().id(),
             position: Vec2::new(-800., -100.),
         });
-        local.spawn_time = 2.;
+        local.spawn_time = 1.;
     }
 }

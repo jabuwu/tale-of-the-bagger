@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_spine::prelude::*;
 
 use crate::{
-    common::{Aabb, CollisionShape, Cursor, DepthLayer, SpineSync2, Transform2},
+    common::{Aabb, CollisionShape, Hoverable, SpineSync2, Transform2},
     AssetLibrary,
 };
 
@@ -32,8 +32,7 @@ impl Plugin for BagPlugin {
                     .label(BagSystem::Update)
                     .after(SpineSystem::Update)
                     .before(SpineSystem::Render),
-            )
-            .add_system(bag_hover.label(BagSystem::Hover));
+            );
     }
 }
 
@@ -43,14 +42,7 @@ pub struct BagSpawnEvent {
 }
 
 #[derive(Default, Component)]
-pub struct Bag {
-    hovered: bool,
-}
-
-#[derive(Component)]
-struct BagHover {
-    shape: CollisionShape,
-}
+pub struct Bag;
 
 fn bag_spawn(
     mut spawn_events: EventReader<BagSpawnEvent>,
@@ -91,44 +83,23 @@ fn bag_spawned(
                         .collect::<Vec<Vec2>>(),
                 )
                 .unwrap();
-                commands.entity(spine_entity).with_children(|parent| {
-                    parent
-                        .spawn_bundle(TransformBundle::default())
-                        .insert(Transform2::from_translation(aabb_bounds.translation))
-                        .insert(DepthLayer::Foreground(1.))
-                        .insert(BagHover {
-                            shape: CollisionShape::Aabb {
-                                half_extents: aabb_bounds.half_extents,
-                            },
-                        });
-                });
+                commands.entity(spine_entity).insert(Hoverable::new(
+                    CollisionShape::Aabb {
+                        half_extents: aabb_bounds.half_extents,
+                    },
+                    aabb_bounds.translation,
+                ));
             }
         }
     }
 }
 
-fn bag_update(mut bag_query: Query<(&mut Spine, &Bag), With<Bag>>) {
-    for (mut bag_spine, bag) in bag_query.iter_mut() {
-        *bag_spine.skeleton.find_slot_mut("bag").unwrap().color_mut() = if bag.hovered {
+fn bag_update(mut bag_query: Query<(&mut Spine, &Hoverable), With<Bag>>) {
+    for (mut bag_spine, bag_hoverable) in bag_query.iter_mut() {
+        *bag_spine.skeleton.find_slot_mut("bag").unwrap().color_mut() = if bag_hoverable.hovered {
             bevy_spine::Color::new_rgba(1., 0., 0., 1.)
         } else {
             bevy_spine::Color::new_rgba(1., 1., 1., 1.)
         };
-    }
-}
-
-fn bag_hover(
-    mut bag_query: Query<&mut Bag>,
-    bag_hover_query: Query<(&BagHover, &GlobalTransform, &Parent)>,
-    cursor: Res<Cursor>,
-) {
-    for (bag_hover, bag_hover_transform, bag_hover_parent) in bag_hover_query.iter() {
-        if let Some(mut bag) = bag_query.get_mut(bag_hover_parent.get()).ok() {
-            bag.hovered = bag_hover.shape.colliding(
-                bag_hover_transform.translation().truncate(),
-                &CollisionShape::Point,
-                cursor.position,
-            );
-        }
     }
 }

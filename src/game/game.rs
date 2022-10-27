@@ -4,8 +4,9 @@ use bevy_kira_audio::{Audio, AudioControl};
 use crate::{common::Transform2, AppState, AssetLibrary};
 
 use super::{
-    BagPlugin, BagSpawnEvent, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent, DeskPlugin,
-    DeskSpawnEvent, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
+    AmbiencePlugin, BagPlugin, BagSpawnEvent, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent,
+    DeskPlugin, DeskSpawnEvent, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND,
+    DEPTH_BACKGROUND_FRONT,
 };
 
 pub struct GamePlugin;
@@ -17,6 +18,7 @@ impl Plugin for GamePlugin {
             .add_plugin(BagPlugin)
             .add_plugin(CustomerPlugin)
             .add_plugin(ProductPlugin)
+            .add_plugin(AmbiencePlugin)
             .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter))
             .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_customers))
             .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_products));
@@ -48,10 +50,6 @@ fn game_enter(
         .insert(DEPTH_BACKGROUND_FRONT);
 
     audio.play(asset_library.audio.ambience.clone()).looped();
-    #[cfg(not(feature = "dev"))]
-    audio
-        .play(asset_library.audio.radio_tune_1.clone())
-        .looped();
 
     desk_spawn_events.send_default();
 

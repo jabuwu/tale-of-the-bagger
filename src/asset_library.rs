@@ -50,4 +50,26 @@ pub struct AudioAssets {
     pub ambience: Handle<AudioSource>,
     #[asset("audio/radio_tune_1.ogg")]
     pub radio_tune_1: Handle<AudioSource>,
+    #[asset("audio/radio_tune_2.ogg")]
+    pub radio_tune_2: Handle<AudioSource>,
+    #[asset("audio/radio_tune_3.ogg")]
+    pub radio_tune_3: Handle<AudioSource>,
+    #[asset("audio/ding_dong.ogg")]
+    pub ding_dong: Handle<AudioSource>,
+    #[asset("audio/announcement_1.ogg")]
+    pub announcement_1: Handle<AudioSource>,
+    #[asset("audio/announcement_2.ogg")]
+    pub announcement_2: Handle<AudioSource>,
+    #[asset("audio/announcement_3.ogg")]
+    pub announcement_3: Handle<AudioSource>,
+    #[asset("audio/announcement_4.ogg")]
+    pub announcement_4: Handle<AudioSource>,
+    #[asset("audio/announcement_5.ogg")]
+    pub announcement_5: Handle<AudioSource>,
+    #[asset("audio/announcement_6.ogg")]
+    pub announcement_6: Handle<AudioSource>,
+    #[asset("audio/announcement_7.ogg")]
+    pub announcement_7: Handle<AudioSource>,
+    #[asset("audio/announcement_8.ogg")]
+    pub announcement_8: Handle<AudioSource>,
 }

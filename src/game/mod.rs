@@ -1,3 +1,4 @@
+mod ambience;
 mod bag;
 mod conveyor;
 mod customer;
@@ -7,6 +8,7 @@ mod game;
 mod product;
 mod products;
 
+pub use ambience::*;
 pub use bag::*;
 pub use conveyor::*;
 pub use customer::*;

@@ -5,7 +5,7 @@ use crate::{common::Transform2, AppState, AssetLibrary};
 
 use super::{
     BagPlugin, BagSpawnEvent, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent, DeskPlugin,
-    DeskSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
+    DeskSpawnEvent, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
 };
 
 pub struct GamePlugin;
@@ -16,8 +16,10 @@ impl Plugin for GamePlugin {
             .add_plugin(ConveyorPlugin)
             .add_plugin(BagPlugin)
             .add_plugin(CustomerPlugin)
+            .add_plugin(ProductPlugin)
             .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter))
-            .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_customers));
+            .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_customers))
+            .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_products));
     }
 }
 
@@ -83,5 +85,26 @@ fn game_spawn_customers(
             ..Default::default()
         });
         local.spawn_time = 17.;
+    }
+}
+
+#[derive(Default)]
+struct GameSpawnProductsLocal {
+    spawn_time: f32,
+}
+
+fn game_spawn_products(
+    mut product_spawn_events: EventWriter<ProductSpawnEvent>,
+    mut local: Local<GameSpawnProductsLocal>,
+    mut commands: Commands,
+    time: Res<Time>,
+) {
+    local.spawn_time -= time.delta_seconds();
+    if local.spawn_time <= 0. {
+        product_spawn_events.send(ProductSpawnEvent {
+            entity: commands.spawn().id(),
+            position: Vec2::new(-800., -100.),
+        });
+        local.spawn_time = 2.;
     }
 }

@@ -11,7 +11,6 @@ use super::DEPTH_BAG;
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
 pub enum BagSystem {
     Spawn,
-    Spawned,
 }
 
 pub struct BagPlugin;

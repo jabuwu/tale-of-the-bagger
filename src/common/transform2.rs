@@ -14,16 +14,17 @@ pub struct Transform2Plugin;
 
 impl Plugin for Transform2Plugin {
     fn build(&self, app: &mut App) {
-        app.add_system_to_stage(
-            CoreStage::PostUpdate,
-            update_transform2
-                .label(Transform2System::TransformPropagate)
-                .before(TransformSystem::TransformPropagate),
-        )
-        .add_system_to_stage(
-            CoreStage::PostUpdate,
-            update_transform2_depth.after(TransformSystem::TransformPropagate),
-        );
+        app.add_system(spine_attach_transform2)
+            .add_system_to_stage(
+                CoreStage::PostUpdate,
+                update_transform2
+                    .label(Transform2System::TransformPropagate)
+                    .before(TransformSystem::TransformPropagate),
+            )
+            .add_system_to_stage(
+                CoreStage::PostUpdate,
+                update_transform2_depth.after(TransformSystem::TransformPropagate),
+            );
     }
 }
 
@@ -106,6 +107,17 @@ impl DepthLayer {
     }
 }
 
+fn spine_attach_transform2(
+    mut spine_ready_event: EventReader<SpineReadyEvent>,
+    mut commands: Commands,
+) {
+    for event in spine_ready_event.iter() {
+        for (_, bone_entity) in event.bones.iter() {
+            commands.entity(*bone_entity).insert(Transform2::default());
+        }
+    }
+}
+
 fn update_transform2(mut query: Query<(Option<&Transform2>, Option<&DepthLayer>, &mut Transform)>) {
     for (transform2, depth_layer, mut transform) in query.iter_mut() {
         if let Some(transform2) = transform2 {
@@ -184,7 +196,7 @@ pub fn spine_sync_entities_2<S: Component>(
             if let Some(bone) = bone.handle.get(&spine.skeleton) {
                 bone_transform.translation.x = bone.x();
                 bone_transform.translation.y = bone.y();
-                bone_transform.rotation = bone.rotation();
+                bone_transform.rotation = bone.rotation().to_radians();
                 bone_transform.scale.x = bone.scale_x();
                 bone_transform.scale.y = bone.scale_y();
             }
@@ -201,7 +213,7 @@ pub fn spine_sync_bones_2<S: Component>(
             if let Some(mut bone) = bone.handle.get_mut(&mut spine.skeleton) {
                 bone.set_x(bone_transform.translation.x);
                 bone.set_y(bone_transform.translation.y);
-                bone.set_rotation(bone_transform.rotation);
+                bone.set_rotation(bone_transform.rotation.to_degrees());
                 bone.set_scale_x(bone_transform.scale.x);
                 bone.set_scale_y(bone_transform.scale.y);
             }
@@ -221,7 +233,7 @@ pub fn spine_sync_entities_applied_2<S: Component>(
             if let Some(bone) = bone.handle.get(&spine.skeleton) {
                 bone_transform.translation.x = bone.applied_x();
                 bone_transform.translation.y = bone.applied_y();
-                bone_transform.rotation = bone.applied_rotation();
+                bone_transform.rotation = bone.applied_rotation().to_radians();
                 bone_transform.scale.x = bone.applied_scale_x();
                 bone_transform.scale.y = bone.applied_scale_y();
             }

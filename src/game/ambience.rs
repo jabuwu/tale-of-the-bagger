@@ -29,7 +29,7 @@ impl Default for AmbienceUpdateLocal {
     fn default() -> Self {
         Self {
             wait_time: 5.,
-            last_ambience: AmbienceKind::Song,
+            last_ambience: AmbienceKind::Announcement,
         }
     }
 }
@@ -60,7 +60,7 @@ fn ambience_update(
                 .clone(),
             );
             local.last_ambience = AmbienceKind::Announcement;
-            local.wait_time = 7.;
+            local.wait_time = 14.;
         } else {
             let ambience = if local.last_ambience == AmbienceKind::Song {
                 AmbienceKind::DingDong
@@ -96,7 +96,7 @@ fn ambience_update(
             local.last_ambience = ambience;
         }
         if local.last_ambience != AmbienceKind::DingDong {
-            local.wait_time += 3.0_f32.lerp(20., random::<f32>());
+            local.wait_time += 3.0_f32.lerp(30., random::<f32>());
         }
     }
 }

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
+use bevy_spine::SpineSystemFunctions;
 
-use crate::common::{CollisionShape, Cursor, Hoverable, Transform2};
+use crate::common::{CollisionShape, GameInput, Interactable, SpineSync2, Transform2};
 
 use super::{ConveyorItem, ConveyorSystem, ProductPlugins, DEPTH_PRODUCT};
 
@@ -17,11 +18,13 @@ impl Plugin for ProductPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(ProductPlugins)
             .add_event::<ProductSpawnEvent>()
+            .add_event::<ProductDropEvent>()
             .add_system(product_spawn.label(ProductSystem::Spawn))
             .add_system(
                 product_update
                     .label(ProductSystem::Update)
-                    .after(ConveyorSystem::ItemUpdate),
+                    .after(ConveyorSystem::ItemUpdate)
+                    .after_spine_sync::<SpineSync2>(),
             )
             .add_system(product_drag.label(ProductSystem::Drag));
     }
@@ -33,10 +36,18 @@ pub struct ProductSpawnEvent {
 }
 
 #[derive(Default, Component)]
-pub struct Product;
+pub struct Product {
+    pub anchor: Option<Entity>,
+}
 
 #[derive(Component)]
-pub struct DraggedProduct;
+pub struct ProductDrag(u64);
+
+#[derive(Debug)]
+pub struct ProductDropEvent {
+    pub entity: Entity,
+    pub position: Vec2,
+}
 
 fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands: Commands) {
     for event in spawn_events.iter() {
@@ -46,7 +57,7 @@ fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands:
             .insert(DEPTH_PRODUCT)
             .insert(Product::default())
             .insert(ConveyorItem::default())
-            .insert(Hoverable::new(
+            .insert(Interactable::new(
                 CollisionShape::Aabb {
                     half_extents: Vec2::splat(80.),
                 },
@@ -57,18 +68,33 @@ fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands:
 
 fn product_update(
     mut product_query: Query<
-        (&mut Transform2, &ConveyorItem, Option<&DraggedProduct>),
+        (
+            &mut Transform2,
+            &Product,
+            Option<&ConveyorItem>,
+            Option<&ProductDrag>,
+        ),
         With<Product>,
     >,
-    cursor: Res<Cursor>,
+    transform_query: Query<&GlobalTransform>,
+    game_input: Res<GameInput>,
 ) {
-    for (mut product_transform, product_conveyor_item, product_dragged) in product_query.iter_mut()
+    for (mut product_transform, product, product_conveyor_item, product_drag) in
+        product_query.iter_mut()
     {
-        let dragging = product_dragged.is_some();
-        let destination = if dragging {
-            cursor.position + Vec2::new(0., -50.)
-        } else {
+        let destination = if let Some(drag_position) =
+            product_drag.and_then(|drag| game_input.drag_position(drag.0))
+        {
+            drag_position + Vec2::new(0., -50.)
+        } else if let Some(product_conveyor_item) = product_conveyor_item {
             product_conveyor_item.position
+        } else if let Some(anchor_transform) = product
+            .anchor
+            .and_then(|anchor_entity| transform_query.get(anchor_entity).ok())
+        {
+            anchor_transform.translation().truncate() + Vec2::new(0., -60.)
+        } else {
+            Vec2::ZERO
         };
         product_transform.translation = destination;
     }
@@ -76,25 +102,27 @@ fn product_update(
 
 fn product_drag(
     mut commands: Commands,
-    product_query: Query<(Entity, &Hoverable), With<Product>>,
-    dragged_product_query: Query<Entity, With<DraggedProduct>>,
-    mouse_buttons: Res<Input<MouseButton>>,
+    mut drop_events: EventWriter<ProductDropEvent>,
+    product_query: Query<
+        (Entity, &Interactable),
+        (With<Product>, With<ConveyorItem>, Without<ProductDrag>),
+    >,
+    product_drag_query: Query<(Entity, &ProductDrag)>,
+    game_input: Res<GameInput>,
 ) {
-    let pressed = mouse_buttons.just_pressed(MouseButton::Left);
-    let released = mouse_buttons.just_released(MouseButton::Left);
-    if pressed || released {
-        for dragged_product_entity in dragged_product_query.iter() {
-            commands
-                .entity(dragged_product_entity)
-                .remove::<DraggedProduct>();
+    for (product_entity, product_interactable) in product_query.iter() {
+        if let Some(drag) = product_interactable.drag_started(game_input.as_ref()) {
+            commands.entity(product_entity).insert(ProductDrag(drag));
+            break;
         }
-        if pressed {
-            for (product_entity, product_hoverable) in product_query.iter() {
-                if product_hoverable.hovered {
-                    commands.entity(product_entity).insert(DraggedProduct);
-                    break;
-                }
-            }
+    }
+    for (product_drag_entity, product_drag) in product_drag_query.iter() {
+        if game_input.drag_ended(product_drag.0) {
+            commands.entity(product_drag_entity).remove::<ProductDrag>();
+            drop_events.send(ProductDropEvent {
+                entity: product_drag_entity,
+                position: game_input.drag_position(product_drag.0).unwrap(),
+            });
         }
     }
 }

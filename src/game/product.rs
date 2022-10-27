@@ -1,9 +1,8 @@
 use bevy::prelude::*;
-use bevy_spine::SpineSystemFunctions;
 
-use crate::common::{CollisionShape, GameInput, Interactable, SpineSync2, Transform2};
+use crate::common::{CollisionShape, GameInput, Interactable, Transform2};
 
-use super::{ConveyorItem, ConveyorSystem, ProductPlugins, DEPTH_PRODUCT};
+use super::{BagSystem, ConveyorItem, ConveyorSystem, ProductPlugins, DEPTH_PRODUCT};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
 pub enum ProductSystem {
@@ -24,7 +23,7 @@ impl Plugin for ProductPlugin {
                 product_update
                     .label(ProductSystem::Update)
                     .after(ConveyorSystem::ItemUpdate)
-                    .after_spine_sync::<SpineSync2>(),
+                    .before(BagSystem::ProductDrop),
             )
             .add_system(product_drag.label(ProductSystem::Drag));
     }
@@ -36,9 +35,7 @@ pub struct ProductSpawnEvent {
 }
 
 #[derive(Default, Component)]
-pub struct Product {
-    pub anchor: Option<Entity>,
-}
+pub struct Product;
 
 #[derive(Component)]
 pub struct ProductDrag(u64);
@@ -61,38 +58,25 @@ fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands:
                 CollisionShape::Aabb {
                     half_extents: Vec2::splat(80.),
                 },
-                Vec2::new(0., 50.),
+                Vec2::ZERO,
             ));
     }
 }
 
 fn product_update(
     mut product_query: Query<
-        (
-            &mut Transform2,
-            &Product,
-            Option<&ConveyorItem>,
-            Option<&ProductDrag>,
-        ),
+        (&mut Transform2, Option<&ConveyorItem>, Option<&ProductDrag>),
         With<Product>,
     >,
-    transform_query: Query<&GlobalTransform>,
     game_input: Res<GameInput>,
 ) {
-    for (mut product_transform, product, product_conveyor_item, product_drag) in
-        product_query.iter_mut()
-    {
+    for (mut product_transform, product_conveyor_item, product_drag) in product_query.iter_mut() {
         let destination = if let Some(drag_position) =
             product_drag.and_then(|drag| game_input.drag_position(drag.0))
         {
-            drag_position + Vec2::new(0., -50.)
+            drag_position
         } else if let Some(product_conveyor_item) = product_conveyor_item {
             product_conveyor_item.position
-        } else if let Some(anchor_transform) = product
-            .anchor
-            .and_then(|anchor_entity| transform_query.get(anchor_entity).ok())
-        {
-            anchor_transform.translation().truncate() + Vec2::new(0., -60.)
         } else {
             Vec2::ZERO
         };

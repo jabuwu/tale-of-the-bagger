@@ -122,12 +122,14 @@ fn bag_update(
 
 fn bag_product_drop(
     mut drop_events: EventReader<ProductDropEvent>,
-    mut product_query: Query<(Entity, &mut Product)>,
+    mut product_query: Query<(Entity, &mut Transform2), With<Product>>,
     mut bag_query: Query<(&mut Bag, &mut Spine, &Interactable)>,
     mut commands: Commands,
 ) {
     for event in drop_events.iter() {
-        if let Some((product_entity, mut product)) = product_query.get_mut(event.entity).ok() {
+        if let Some((product_entity, mut product_transform)) =
+            product_query.get_mut(event.entity).ok()
+        {
             for (mut bag, mut bag_spine, bag_interactable) in bag_query.iter_mut() {
                 if bag_interactable.contains_point(event.position) {
                     if bag.slots.len() > 0 {
@@ -136,8 +138,9 @@ fn bag_product_drop(
                                 .animation_state
                                 .set_animation_by_name(0, "animation", false);
                         commands.entity(product_entity).remove::<ConveyorItem>();
-                        product.anchor = Some(bag.slots[0]);
+                        commands.entity(bag.slots[0]).add_child(product_entity);
                         bag.slots.remove(0);
+                        product_transform.translation = Vec2::ZERO;
                     }
                 }
             }

@@ -14,17 +14,12 @@ pub struct Transform2Plugin;
 
 impl Plugin for Transform2Plugin {
     fn build(&self, app: &mut App) {
-        app.add_system(spine_attach_transform2)
-            .add_system_to_stage(
-                CoreStage::PostUpdate,
-                update_transform2
-                    .label(Transform2System::TransformPropagate)
-                    .before(TransformSystem::TransformPropagate),
-            )
-            .add_system_to_stage(
-                CoreStage::PostUpdate,
-                update_transform2_depth.after(TransformSystem::TransformPropagate),
-            );
+        app.add_system(spine_attach_transform2).add_system_to_stage(
+            CoreStage::PostUpdate,
+            update_transform2
+                .label(Transform2System::TransformPropagate)
+                .before(TransformSystem::TransformPropagate),
+        );
     }
 }
 
@@ -33,7 +28,6 @@ pub struct Transform2 {
     pub translation: Vec2,
     pub rotation: f32,
     pub scale: Vec2,
-    pub pixel_perfect: bool,
 }
 
 impl Default for Transform2 {
@@ -42,7 +36,6 @@ impl Default for Transform2 {
             translation: Vec2::ZERO,
             rotation: 0.0,
             scale: Vec2::ONE,
-            pixel_perfect: true,
         }
     }
 }
@@ -73,13 +66,6 @@ impl Transform2 {
     pub fn with_scale(self, scale: Vec2) -> Self {
         Self { scale, ..self }
     }
-
-    pub fn without_pixel_perfect(self) -> Self {
-        Self {
-            pixel_perfect: false,
-            ..self
-        }
-    }
 }
 
 #[derive(Component, Debug, Clone, Copy, PartialEq)]
@@ -100,8 +86,8 @@ impl DepthLayer {
     pub fn depth_f32(&self) -> f32 {
         match *self {
             DepthLayer::Inherit(depth) => 0.0_f32.lerp(0.01, depth),
-            DepthLayer::Background(depth) => 0.1_f32.lerp(0.19, depth),
-            DepthLayer::Foreground(depth) => 0.2_f32.lerp(0.29, depth),
+            DepthLayer::Background(depth) => 0.1_f32.lerp(0.39, depth),
+            DepthLayer::Foreground(depth) => 0.4_f32.lerp(0.99, depth),
             DepthLayer::Camera => 1.0,
         }
     }
@@ -118,7 +104,7 @@ fn spine_attach_transform2(
     }
 }
 
-fn update_transform2(mut query: Query<(Option<&Transform2>, Option<&DepthLayer>, &mut Transform)>) {
+/*fn update_transform2(mut query: Query<(Option<&Transform2>, Option<&DepthLayer>, &mut Transform)>) {
     for (transform2, depth_layer, mut transform) in query.iter_mut() {
         if let Some(transform2) = transform2 {
             transform.translation.x = transform2.translation.x;
@@ -130,26 +116,43 @@ fn update_transform2(mut query: Query<(Option<&Transform2>, Option<&DepthLayer>,
             transform.translation.z = depth_layer.depth_f32();
         }
     }
+}*/
+
+fn update_transform2(
+    root_query: Query<Entity, Without<Parent>>,
+    children_query: Query<&Children>,
+    mut transform_query: Query<(&mut Transform, Option<&Transform2>, Option<&DepthLayer>)>,
+) {
+    for root in root_query.iter() {
+        update_transform2_recursive(root, &children_query, &mut transform_query, 0.);
+    }
 }
 
-fn update_transform2_depth(
-    mut query: Query<(
-        Option<&Transform2>,
-        Option<&DepthLayer>,
-        &mut GlobalTransform,
-    )>,
+fn update_transform2_recursive(
+    entity: Entity,
+    children_query: &Query<&Children>,
+    transform_query: &mut Query<(&mut Transform, Option<&Transform2>, Option<&DepthLayer>)>,
+    mut cumulative_depth: f32,
 ) {
-    for (transform2, depth_layer, mut transform) in query.iter_mut() {
+    if let Some((mut transform, transform2, depth_layer)) = transform_query.get_mut(entity).ok() {
         if let Some(transform2) = transform2 {
-            if transform2.pixel_perfect {
-                transform.translation_mut().x = transform.translation_mut().x.round();
-                transform.translation_mut().y = transform.translation_mut().y.round();
-            }
+            transform.translation.x = transform2.translation.x;
+            transform.translation.y = transform2.translation.y;
+            transform.scale = Vec3::new(transform2.scale.x, transform2.scale.y, 1.0);
+            transform.rotation = Quat::from_rotation_z(transform2.rotation);
         }
         if let Some(depth_layer) = depth_layer {
-            if !matches!(depth_layer, DepthLayer::Inherit(..)) {
-                transform.translation_mut().z = depth_layer.depth_f32();
+            if matches!(depth_layer, DepthLayer::Inherit(..)) {
+                transform.translation.z = depth_layer.depth_f32();
+            } else {
+                transform.translation.z = depth_layer.depth_f32() - cumulative_depth;
             }
+        }
+        cumulative_depth += transform.translation.z;
+    }
+    if let Some(children) = children_query.get(entity).ok() {
+        for child in children.iter() {
+            update_transform2_recursive(*child, children_query, transform_query, cumulative_depth);
         }
     }
 }

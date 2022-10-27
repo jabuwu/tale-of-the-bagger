@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 
-use crate::common::{CollisionShape, GameInput, Interactable, Transform2};
+use crate::common::{CollisionShape, DepthLayer, GameInput, Interactable, Transform2};
 
-use super::{BagSystem, ConveyorItem, ConveyorSystem, ProductPlugins, DEPTH_PRODUCT};
+use super::{
+    BagSystem, ConveyorItem, ConveyorSystem, ProductPlugins, DEPTH_PRODUCT, DEPTH_PRODUCT_DRAGGING,
+};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
 pub enum ProductSystem {
@@ -65,12 +67,19 @@ fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands:
 
 fn product_update(
     mut product_query: Query<
-        (&mut Transform2, Option<&ConveyorItem>, Option<&ProductDrag>),
+        (
+            &mut Transform2,
+            &mut DepthLayer,
+            Option<&ConveyorItem>,
+            Option<&ProductDrag>,
+        ),
         With<Product>,
     >,
     game_input: Res<GameInput>,
 ) {
-    for (mut product_transform, product_conveyor_item, product_drag) in product_query.iter_mut() {
+    for (mut product_transform, mut product_depth_layer, product_conveyor_item, product_drag) in
+        product_query.iter_mut()
+    {
         let destination = if let Some(drag_position) =
             product_drag.and_then(|drag| game_input.drag_position(drag.0))
         {
@@ -81,6 +90,11 @@ fn product_update(
             Vec2::ZERO
         };
         product_transform.translation = destination;
+        *product_depth_layer = if product_drag.is_some() {
+            DEPTH_PRODUCT_DRAGGING
+        } else {
+            DEPTH_PRODUCT
+        };
     }
 }
 

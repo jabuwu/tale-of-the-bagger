@@ -48,14 +48,17 @@ pub struct SpineAssets {
 pub struct AudioAssets {
     #[asset("audio/ambience.ogg")]
     pub ambience: Handle<AudioSource>,
+
     #[asset("audio/radio_tune_1.ogg")]
     pub radio_tune_1: Handle<AudioSource>,
     #[asset("audio/radio_tune_2.ogg")]
     pub radio_tune_2: Handle<AudioSource>,
     #[asset("audio/radio_tune_3.ogg")]
     pub radio_tune_3: Handle<AudioSource>,
+
     #[asset("audio/ding_dong.ogg")]
     pub ding_dong: Handle<AudioSource>,
+
     #[asset("audio/announcement_1.ogg")]
     pub announcement_1: Handle<AudioSource>,
     #[asset("audio/announcement_2.ogg")]
@@ -72,4 +75,27 @@ pub struct AudioAssets {
     pub announcement_7: Handle<AudioSource>,
     #[asset("audio/announcement_8.ogg")]
     pub announcement_8: Handle<AudioSource>,
+
+    #[asset("audio/bag_insert_1.ogg")]
+    pub bag_insert_1: Handle<AudioSource>,
+    #[asset("audio/bag_insert_2.ogg")]
+    pub bag_insert_2: Handle<AudioSource>,
+    #[asset("audio/bag_insert_3.ogg")]
+    pub bag_insert_3: Handle<AudioSource>,
+    #[asset("audio/bag_insert_4.ogg")]
+    pub bag_insert_4: Handle<AudioSource>,
+    #[asset("audio/bag_insert_5.ogg")]
+    pub bag_insert_5: Handle<AudioSource>,
+    #[asset("audio/bag_insert_6.ogg")]
+    pub bag_insert_6: Handle<AudioSource>,
+    #[asset("audio/bag_insert_7.ogg")]
+    pub bag_insert_7: Handle<AudioSource>,
+    #[asset("audio/bag_insert_8.ogg")]
+    pub bag_insert_8: Handle<AudioSource>,
+    #[asset("audio/bag_insert_9.ogg")]
+    pub bag_insert_9: Handle<AudioSource>,
+    #[asset("audio/bag_insert_10.ogg")]
+    pub bag_insert_10: Handle<AudioSource>,
+    #[asset("audio/bag_insert_11.ogg")]
+    pub bag_insert_11: Handle<AudioSource>,
 }

@@ -1,5 +1,7 @@
 use bevy::prelude::*;
+use bevy_kira_audio::{Audio, AudioControl};
 use bevy_spine::prelude::*;
+use rand::{seq::SliceRandom, thread_rng};
 
 use crate::{
     common::{Aabb, CollisionShape, GameInput, Interactable, SpineSync2, Transform2},
@@ -125,6 +127,8 @@ fn bag_product_drop(
     mut product_query: Query<(Entity, &mut Transform2), With<Product>>,
     mut bag_query: Query<(&mut Bag, &mut Spine, &Interactable)>,
     mut commands: Commands,
+    audio: Res<Audio>,
+    asset_library: Res<AssetLibrary>,
 ) {
     for event in drop_events.iter() {
         if let Some((product_entity, mut product_transform)) =
@@ -141,6 +145,24 @@ fn bag_product_drop(
                         commands.entity(bag.slots[0]).add_child(product_entity);
                         bag.slots.remove(0);
                         product_transform.translation = Vec2::ZERO;
+                        audio.play(
+                            [
+                                asset_library.audio.bag_insert_1.clone(),
+                                asset_library.audio.bag_insert_2.clone(),
+                                asset_library.audio.bag_insert_3.clone(),
+                                asset_library.audio.bag_insert_4.clone(),
+                                asset_library.audio.bag_insert_5.clone(),
+                                asset_library.audio.bag_insert_6.clone(),
+                                asset_library.audio.bag_insert_7.clone(),
+                                asset_library.audio.bag_insert_8.clone(),
+                                asset_library.audio.bag_insert_9.clone(),
+                                asset_library.audio.bag_insert_10.clone(),
+                                asset_library.audio.bag_insert_11.clone(),
+                            ]
+                            .choose(&mut thread_rng())
+                            .unwrap()
+                            .clone(),
+                        );
                     }
                 }
             }

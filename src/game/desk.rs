@@ -45,7 +45,7 @@ fn desk_spawn(
                 skeleton: asset_library.spines.desk.clone(),
                 ..Default::default()
             })
-            .insert(Transform2::from_xy(-105., -256.5).with_scale(Vec2::splat(0.75)))
+            .insert(Transform2::from_xy(-140., -342.))
             .insert(DEPTH_DESK)
             .insert(SpineSync2)
             .insert(Desk);

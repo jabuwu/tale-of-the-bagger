@@ -13,13 +13,13 @@ pub use crate::{app_state::AppState, asset_library::AssetLibrary};
 pub fn game() {
     App::new()
         .insert_resource(Msaa { samples: 1 })
-        .insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)))
+        .insert_resource(ClearColor(Color::BLACK))
         .insert_resource(WindowDescriptor {
             width: 1440.,
             height: 810.,
-            resizable: false,
             title: "Tale of the Bagger: A Love Story".to_string(), // ToDo
             canvas: Some("#bevy".to_owned()),
+            fit_canvas_to_parent: true,
             ..Default::default()
         })
         .init_resource::<AssetLibrary>()

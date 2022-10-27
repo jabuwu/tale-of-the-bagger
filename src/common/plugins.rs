@@ -1,6 +1,6 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
-use super::{CursorPlugin, SpineSync2Plugin, Transform2Plugin};
+use super::{CursorPlugin, ForceCameraRatioPlugin, SpineSync2Plugin, Transform2Plugin};
 
 pub struct CommonPlugins;
 
@@ -9,5 +9,6 @@ impl PluginGroup for CommonPlugins {
         group.add(CursorPlugin);
         group.add(Transform2Plugin);
         group.add(SpineSync2Plugin::default());
+        group.add(ForceCameraRatioPlugin);
     }
 }

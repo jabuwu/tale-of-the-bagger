@@ -41,7 +41,7 @@ fn bag_spawn(
                 skeleton: asset_library.spines.bag.clone(),
                 ..Default::default()
             })
-            .insert(Transform2::from_translation(event.position).with_scale(Vec2::splat(0.75)))
+            .insert(Transform2::from_translation(event.position))
             .insert(DEPTH_BAG)
             .insert(SpineSync2)
             .insert(Bag);

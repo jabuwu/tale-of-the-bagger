@@ -45,7 +45,7 @@ fn customer_spawn(
                 skeleton: asset_library.spines.customer.clone(),
                 ..Default::default()
             })
-            .insert(Transform2::from_translation(event.position).with_scale(Vec2::splat(0.75)))
+            .insert(Transform2::from_translation(event.position))
             .insert(DEPTH_CUSTOMER)
             .insert(SpineSync2)
             .insert(Customer);
@@ -71,8 +71,8 @@ fn customer_update(
     time: Res<Time>,
 ) {
     for (customer_entity, mut customer_transform) in customer_query.iter_mut() {
-        customer_transform.translation.x += time.delta_seconds() * 100.;
-        if customer_transform.translation.x > 800. {
+        customer_transform.translation.x += time.delta_seconds() * 150.;
+        if customer_transform.translation.x > 1100. {
             commands.entity(customer_entity).despawn_recursive();
         }
     }

@@ -37,7 +37,7 @@ fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands:
     for event in spawn_events.iter() {
         commands
             .entity(event.entity)
-            .insert(Transform2::from_translation(event.position).with_scale(Vec2::splat(0.75)))
+            .insert(Transform2::from_translation(event.position))
             .insert(DEPTH_PRODUCT)
             .insert(Product)
             .insert(ConveyorItem::default());

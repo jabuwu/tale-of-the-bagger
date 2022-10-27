@@ -66,8 +66,8 @@ fn conveyor_item_update(
     for (conveyor_entity, mut conveyor_item) in conveyor_item_query.iter_mut() {
         let (conveyor_scale, _, _) = conveyor_transform.to_scale_rotation_translation();
         conveyor_item.progress += (time.delta_seconds() * conveyor.speed) * conveyor_scale.x;
-        conveyor_item.position = Vec2::new(-800. + conveyor_item.progress, -320.);
-        if conveyor_item.progress > 1250. {
+        conveyor_item.position = Vec2::new(-1066. + conveyor_item.progress, -427.);
+        if conveyor_item.progress > 1666. {
             commands.entity(conveyor_entity).despawn_recursive();
         }
     }

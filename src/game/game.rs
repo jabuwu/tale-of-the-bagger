@@ -37,33 +37,33 @@ fn game_enter(
             texture: asset_library.textures.background.clone(),
             ..Default::default()
         })
-        .insert(Transform2::from_xy(0., 0.).with_scale(Vec2::splat(0.75)))
+        .insert(Transform2::from_xy(0., 0.))
         .insert(DEPTH_BACKGROUND);
     commands
         .spawn_bundle(SpriteBundle {
             texture: asset_library.textures.background_front.clone(),
             ..Default::default()
         })
-        .insert(Transform2::from_xy(0., 0.).with_scale(Vec2::splat(0.75)))
+        .insert(Transform2::from_xy(0., 0.))
         .insert(DEPTH_BACKGROUND_FRONT);
 
     audio.play(asset_library.audio.ambience.clone()).looped();
-    audio
-        .play(asset_library.audio.radio_tune_1.clone())
-        .looped();
+    /*audio
+    .play(asset_library.audio.radio_tune_1.clone())
+    .looped();*/
 
     desk_spawn_events.send_default();
 
     bag_spawn_events.send(BagSpawnEvent {
-        position: Vec2::new(-525., -190.),
+        position: Vec2::new(-700., -253.),
         ..Default::default()
     });
     bag_spawn_events.send(BagSpawnEvent {
-        position: Vec2::new(-120., -190.),
+        position: Vec2::new(-160., -253.),
         ..Default::default()
     });
     bag_spawn_events.send(BagSpawnEvent {
-        position: Vec2::new(290., -190.),
+        position: Vec2::new(387., -253.),
         ..Default::default()
     });
 }
@@ -81,7 +81,7 @@ fn game_spawn_customers(
     local.spawn_time -= time.delta_seconds();
     if local.spawn_time <= 0. {
         customer_spawn_events.send(CustomerSpawnEvent {
-            position: Vec2::new(-800., -100.),
+            position: Vec2::new(-1100., -125.),
             ..Default::default()
         });
         local.spawn_time = 17.;

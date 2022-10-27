@@ -6,6 +6,9 @@ html {
 body {
     background-color: #111;
     margin: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    touch-action: none;
 }
 
 .game-container {

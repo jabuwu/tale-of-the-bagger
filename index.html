@@ -13,6 +13,9 @@ html {
 body {
     background-color: #111;
     margin: 0;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    touch-action: none;
 }
 
 .game-container {
@@ -28,6 +31,10 @@ body {
     width: 800px;
     height: 600px;
 }</style>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    
 
 <link rel="preload" href="/tale-of-the-bagger-f4606334e011f4e2_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
 <link rel="modulepreload" href="/tale-of-the-bagger-f4606334e011f4e2.js"></head>

@@ -65,8 +65,15 @@ fn customer_spawned(
     }
 }
 
-fn customer_update(mut customer_query: Query<&mut Transform2, With<Customer>>, time: Res<Time>) {
-    for mut customer_transform in customer_query.iter_mut() {
+fn customer_update(
+    mut customer_query: Query<(Entity, &mut Transform2), With<Customer>>,
+    mut commands: Commands,
+    time: Res<Time>,
+) {
+    for (customer_entity, mut customer_transform) in customer_query.iter_mut() {
         customer_transform.translation.x += time.delta_seconds() * 100.;
+        if customer_transform.translation.x > 800. {
+            commands.entity(customer_entity).despawn_recursive();
+        }
     }
 }

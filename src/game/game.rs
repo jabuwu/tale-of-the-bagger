@@ -102,7 +102,7 @@ fn game_spawn_products(
     if local.spawn_time <= 0. {
         product_spawn_events.send(ProductSpawnEvent {
             entity: commands.spawn().id(),
-            position: Vec2::new(-800., -100.),
+            position: Vec2::new(-2000., -100.),
         });
         local.spawn_time = 1.;
     }

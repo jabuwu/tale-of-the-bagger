@@ -76,6 +76,7 @@ fn product_update(
         With<Product>,
     >,
     game_input: Res<GameInput>,
+    time: Res<Time>,
 ) {
     for (mut product_transform, mut product_depth_layer, product_conveyor_item, product_drag) in
         product_query.iter_mut()
@@ -89,7 +90,9 @@ fn product_update(
         } else {
             Vec2::ZERO
         };
-        product_transform.translation = destination;
+        product_transform.translation = product_transform
+            .translation
+            .lerp(destination, time.delta_seconds() * 15.);
         *product_depth_layer = if product_drag.is_some() {
             DEPTH_PRODUCT_DRAGGING
         } else {

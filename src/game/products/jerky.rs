@@ -96,7 +96,7 @@ fn product_jerky_rig_update(
         let mut d3 = rig
             .d3_controller
             .update(rig_transform.translation().truncate(), time.delta_seconds());
-        d3 = (d3 - rig_transform.translation().truncate()) * 0.1;
+        d3 = (d3 - rig_transform.translation().truncate()) * 0.08;
         let mut d3_bone = rig.d3.get_mut(&mut rig_spine.skeleton).unwrap();
         let original_position: Vec2 = d3_bone.data().position().into();
         d3_bone.set_position(original_position - d3);

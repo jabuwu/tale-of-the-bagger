@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 
 use crate::{
-    common::{CollisionShape, DepthLayer, GameInput, Interactable, Transform2},
+    common::{
+        CollisionShape, DepthLayer, GameInput, Interactable, SecondOrderController, Transform2,
+    },
     AssetLibrary,
 };
 
@@ -40,8 +42,18 @@ pub struct ProductSpawnEvent {
     pub position: Vec2,
 }
 
-#[derive(Default, Component)]
-pub struct Product;
+#[derive(Component)]
+pub struct Product {
+    scale_controller: SecondOrderController<f32>,
+}
+
+impl Default for Product {
+    fn default() -> Self {
+        Self {
+            scale_controller: SecondOrderController::new(1., 4., 0.5, -3.2),
+        }
+    }
+}
 
 #[derive(Component)]
 pub struct ProductDrag(u64);
@@ -83,20 +95,23 @@ fn product_spawn(
 }
 
 fn product_update(
-    mut product_query: Query<
-        (
-            &mut Transform2,
-            &mut DepthLayer,
-            Option<&ConveyorItem>,
-            Option<&ProductDrag>,
-        ),
-        With<Product>,
-    >,
+    mut product_query: Query<(
+        &mut Product,
+        &mut Transform2,
+        &mut DepthLayer,
+        Option<&ConveyorItem>,
+        Option<&ProductDrag>,
+    )>,
     game_input: Res<GameInput>,
     time: Res<Time>,
 ) {
-    for (mut product_transform, mut product_depth_layer, product_conveyor_item, product_drag) in
-        product_query.iter_mut()
+    for (
+        mut product,
+        mut product_transform,
+        mut product_depth_layer,
+        product_conveyor_item,
+        product_drag,
+    ) in product_query.iter_mut()
     {
         let destination = if let Some(drag_position) =
             product_drag.and_then(|drag| game_input.drag_position(drag.0))
@@ -110,6 +125,10 @@ fn product_update(
         product_transform.translation = product_transform
             .translation
             .lerp(destination, time.delta_seconds() * 25.);
+        product_transform.scale = Vec2::splat(product.scale_controller.update(
+            if product_drag.is_some() { 1.4 } else { 1. },
+            time.delta_seconds(),
+        ));
         *product_depth_layer = if product_drag.is_some() {
             DEPTH_PRODUCT_DRAGGING
         } else {

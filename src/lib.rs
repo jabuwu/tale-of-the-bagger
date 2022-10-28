@@ -17,7 +17,7 @@ pub fn game() {
         .insert_resource(WindowDescriptor {
             width: 1440.,
             height: 810.,
-            title: "Tale of the Bagger: A Love Story".to_string(), // ToDo
+            title: "Tale of the Bagger: A Love Story".to_string(),
             canvas: Some("#bevy".to_owned()),
             fit_canvas_to_parent: true,
             ..Default::default()

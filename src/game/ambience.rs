@@ -9,7 +9,8 @@ pub struct AmbiencePlugin;
 
 impl Plugin for AmbiencePlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_update(AppState::Game).with_system(ambience_update));
+        app.add_system_set(SystemSet::on_enter(AppState::Game).with_system(ambience_setup))
+            .add_system_set(SystemSet::on_update(AppState::Game).with_system(ambience_update));
     }
 }
 
@@ -32,6 +33,10 @@ impl Default for AmbienceUpdateLocal {
             last_ambience: AmbienceKind::Announcement,
         }
     }
+}
+
+fn ambience_setup(audio: Res<Audio>, asset_library: Res<AssetLibrary>) {
+    audio.play(asset_library.audio.ambience.clone()).looped();
 }
 
 fn ambience_update(

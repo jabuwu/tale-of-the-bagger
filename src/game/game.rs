@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_kira_audio::{Audio, AudioControl};
 
 use crate::{common::Transform2, AppState, AssetLibrary};
 
@@ -30,7 +29,6 @@ fn game_enter(
     mut desk_spawn_events: EventWriter<DeskSpawnEvent>,
     mut bag_spawn_events: EventWriter<BagSpawnEvent>,
     asset_library: Res<AssetLibrary>,
-    audio: Res<Audio>,
 ) {
     commands.spawn_bundle(Camera2dBundle::default());
 
@@ -48,8 +46,6 @@ fn game_enter(
         })
         .insert(Transform2::from_xy(0., 0.))
         .insert(DEPTH_BACKGROUND_FRONT);
-
-    audio.play(asset_library.audio.ambience.clone()).looped();
 
     desk_spawn_events.send_default();
 

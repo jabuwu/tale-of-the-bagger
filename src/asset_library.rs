@@ -29,6 +29,9 @@ pub struct TextureAssets {
     pub background: Handle<Image>,
     #[asset("textures/background_front.png")]
     pub background_front: Handle<Image>,
+
+    #[asset("textures/icons/meat.png")]
+    pub icon_meat: Handle<Image>,
 }
 
 #[derive(Default, AssetCollection)]

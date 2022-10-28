@@ -1,9 +1,13 @@
 use bevy::prelude::*;
 
-use crate::common::{CollisionShape, DepthLayer, GameInput, Interactable, Transform2};
+use crate::{
+    common::{CollisionShape, DepthLayer, GameInput, Interactable, Transform2},
+    AssetLibrary,
+};
 
 use super::{
     BagSystem, ConveyorItem, ConveyorSystem, ProductPlugins, DEPTH_PRODUCT, DEPTH_PRODUCT_DRAGGING,
+    DEPTH_PRODUCT_ICON,
 };
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
@@ -48,7 +52,11 @@ pub struct ProductDropEvent {
     pub position: Vec2,
 }
 
-fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands: Commands) {
+fn product_spawn(
+    mut spawn_events: EventReader<ProductSpawnEvent>,
+    mut commands: Commands,
+    asset_library: Res<AssetLibrary>,
+) {
     for event in spawn_events.iter() {
         commands
             .entity(event.entity)
@@ -61,7 +69,16 @@ fn product_spawn(mut spawn_events: EventReader<ProductSpawnEvent>, mut commands:
                     half_extents: Vec2::splat(80.),
                 },
                 Vec2::ZERO,
-            ));
+            ))
+            .with_children(|parent| {
+                parent
+                    .spawn_bundle(SpriteBundle {
+                        texture: asset_library.textures.icon_meat.clone(),
+                        ..Default::default()
+                    })
+                    .insert(Transform2::from_xy(60., -50.).with_scale(Vec2::splat(0.75)))
+                    .insert(DEPTH_PRODUCT_ICON);
+            });
     }
 }
 

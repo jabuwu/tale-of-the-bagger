@@ -629,7 +629,7 @@ dependencies = [
 [[package]]
 name = "bevy_spine"
 version = "0.2.0"
-source = "git+https://github.com/jabuwu/bevy_spine?rev=3e413237727abefd1a1095d359d78d8adaba6dba#3e413237727abefd1a1095d359d78d8adaba6dba"
+source = "git+https://github.com/jabuwu/bevy_spine?rev=83efea5d12b99547827236af06f8c010e4646ee0#83efea5d12b99547827236af06f8c010e4646ee0"
 dependencies = [
  "bevy",
  "glam",

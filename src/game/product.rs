@@ -92,7 +92,7 @@ fn product_update(
         };
         product_transform.translation = product_transform
             .translation
-            .lerp(destination, time.delta_seconds() * 15.);
+            .lerp(destination, time.delta_seconds() * 25.);
         *product_depth_layer = if product_drag.is_some() {
             DEPTH_PRODUCT_DRAGGING
         } else {

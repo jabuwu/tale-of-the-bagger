@@ -95,7 +95,12 @@ fn game_input_update(
     } else {
         Mat4::IDENTITY
     };
-    let to_world = move |position: Vec2| to_world_matrix.project_point3(((position / window_size) * 2.0 - Vec2::ONE).extend(-1.0)).truncate() * Vec2::new(1., -1.);
+    let to_world = move |position: Vec2| {
+        to_world_matrix
+            .project_point3(((position / window_size) * 2.0 - Vec2::ONE).extend(-1.0))
+            .truncate()
+            * Vec2::new(1., -1.)
+    };
 
     game_input.cursor_position = None;
     if let Some(window) = windows.get_primary() {

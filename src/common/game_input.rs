@@ -81,21 +81,26 @@ pub enum GameInputDragSource {
 fn game_input_update(
     mut game_input: ResMut<GameInput>,
     windows: Res<Windows>,
-    camera: Query<(&Camera, &GlobalTransform)>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
     mouse_buttons: Res<Input<MouseButton>>,
+    touches: Res<Touches>,
 ) {
+    let window_size = if let Some(window) = windows.get_primary() {
+        Vec2::new(window.width() as f32, window.height() as f32)
+    } else {
+        Vec2::new(1440., 810.)
+    };
+    let to_world_matrix = if let Some((camera, camera_transform)) = camera_query.get_single().ok() {
+        camera_transform.compute_matrix() * camera.projection_matrix().inverse()
+    } else {
+        Mat4::IDENTITY
+    };
+    let to_world = move |position: Vec2| to_world_matrix.project_point3(((position / window_size) * 2.0 - Vec2::ONE).extend(-1.0)).truncate() * Vec2::new(1., -1.);
+
     game_input.cursor_position = None;
     if let Some(window) = windows.get_primary() {
-        if let Some(position) = window.cursor_position() {
-            if let Ok((camera, camera_transform)) = camera.get_single() {
-                let window_size = Vec2::new(window.width() as f32, window.height() as f32);
-                let ndc = (position / window_size) * 2.0 - Vec2::ONE;
-                let ndc_to_world =
-                    camera_transform.compute_matrix() * camera.projection_matrix().inverse();
-                let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
-                let world_pos: Vec2 = world_pos.truncate();
-                game_input.cursor_position = Some(world_pos);
-            }
+        if let Some(cursor_position) = window.cursor_position() {
+            game_input.cursor_position = Some(to_world(cursor_position) * Vec2::new(1., -1.));
         }
     }
 
@@ -107,8 +112,40 @@ fn game_input_update(
     }
     game_input.drags.retain(|drag| !drag.ended);
 
+    let mut has_touch = false;
+    for touch in touches.iter() {
+        if touches.just_pressed(touch.id()) {
+            let id = game_input.next_drag_id();
+            game_input.drags.push(GameInputDrag {
+                id,
+                source: GameInputDragSource::Touch(touch.id()),
+                position: to_world(touch.position()),
+                started: true,
+                ended: false,
+            });
+        } else {
+            if let Some(touch_drag) = game_input
+                .drags
+                .iter_mut()
+                .find(|drag| drag.source == GameInputDragSource::Touch(touch.id()))
+            {
+                touch_drag.position = to_world(touch.position());
+            }
+        }
+        has_touch = true;
+    }
+    for touch in touches.iter_just_released() {
+        if let Some(touch_drag) = game_input
+            .drags
+            .iter_mut()
+            .find(|drag| drag.source == GameInputDragSource::Touch(touch.id()))
+        {
+            touch_drag.ended = true;
+        }
+    }
+
     if let Some(cursor_position) = game_input.cursor_position {
-        if mouse_buttons.just_pressed(MouseButton::Left) {
+        if mouse_buttons.just_pressed(MouseButton::Left) && !has_touch {
             let id = game_input.next_drag_id();
             game_input.drags.push(GameInputDrag {
                 id,
@@ -127,7 +164,7 @@ fn game_input_update(
             }
         }
     }
-    if mouse_buttons.just_released(MouseButton::Left) {
+    if mouse_buttons.just_released(MouseButton::Left) || has_touch {
         if let Some(mouse_drag) = game_input
             .drags
             .iter_mut()

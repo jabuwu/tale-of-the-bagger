@@ -20,7 +20,5 @@ body {
 }
 
 #bevy {
-    background-color: white;
-    width: 800px;
-    height: 600px;
+    background-color: #111;
 }

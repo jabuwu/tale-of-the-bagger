@@ -63,6 +63,18 @@ pub struct GameInputDrag {
 }
 
 impl GameInputDrag {
+    pub fn new(id: u64, source: GameInputDragSource, position: Vec2) -> Self {
+        Self {
+            id,
+            source,
+            position,
+            started: true,
+            ended: false,
+        }
+    }
+}
+
+impl GameInputDrag {
     pub fn id(&self) -> u64 {
         self.id
     }
@@ -125,13 +137,11 @@ fn game_input_update(
     for touch in touches.iter() {
         if touches.just_pressed(touch.id()) {
             let id = game_input.next_drag_id();
-            game_input.drags.push(GameInputDrag {
+            game_input.drags.push(GameInputDrag::new(
                 id,
-                source: GameInputDragSource::Touch(touch.id()),
-                position: to_world(touch.position()),
-                started: true,
-                ended: false,
-            });
+                GameInputDragSource::Touch(touch.id()),
+                to_world(touch.position()),
+            ));
         } else {
             if let Some(touch_drag) = game_input
                 .drags
@@ -152,17 +162,24 @@ fn game_input_update(
             touch_drag.ended = true;
         }
     }
+    for touch in touches.iter_just_cancelled() {
+        if let Some(touch_drag) = game_input
+            .drags
+            .iter_mut()
+            .find(|drag| drag.source == GameInputDragSource::Touch(touch.id()))
+        {
+            touch_drag.ended = true;
+        }
+    }
 
     if let Some(cursor_position) = game_input.cursor_position {
         if mouse_buttons.just_pressed(MouseButton::Left) && !has_touch {
             let id = game_input.next_drag_id();
-            game_input.drags.push(GameInputDrag {
+            game_input.drags.push(GameInputDrag::new(
                 id,
-                source: GameInputDragSource::Cursor,
-                position: cursor_position,
-                started: true,
-                ended: false,
-            });
+                GameInputDragSource::Cursor,
+                cursor_position,
+            ));
         } else {
             if let Some(mouse_drag) = game_input
                 .drags

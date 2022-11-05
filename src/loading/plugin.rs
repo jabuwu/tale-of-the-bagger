@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_spine::prelude::*;
 
-use crate::{AppState, AssetLibrary};
+use crate::{common::VersionSpawnEvent, AppState, AssetLibrary};
 
 pub struct LoadingPlugin;
 
@@ -15,9 +15,11 @@ impl Plugin for LoadingPlugin {
 fn loading_enter(
     mut asset_library: ResMut<AssetLibrary>,
     mut skeletons: ResMut<Assets<SkeletonData>>,
+    mut version_spawn_events: EventWriter<VersionSpawnEvent>,
     asset_server: Res<AssetServer>,
 ) {
     asset_library.load_assets(skeletons.as_mut(), asset_server.as_ref());
+    version_spawn_events.send_default();
 }
 
 fn loading_update(mut app_state: ResMut<State<AppState>>, time: Res<Time>) {

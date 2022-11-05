@@ -6,6 +6,7 @@ mod game_input;
 mod interactable;
 mod plugins;
 mod transform2;
+mod version;
 
 pub use asset_collection::*;
 pub use collision::*;
@@ -15,6 +16,7 @@ pub use game_input::*;
 pub use interactable::*;
 pub use plugins::*;
 pub use transform2::*;
+pub use version::*;
 
 #[cfg(feature = "embedded_assets")]
 pub mod embedded_assets;

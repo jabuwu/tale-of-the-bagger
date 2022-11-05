@@ -1,6 +1,6 @@
 [package]
 name = "tale-of-the-bagger"
-version = "0.1.0"
+version = "0.2.0-dev"
 publish = false
 authors = ["jabu <jabu@gx.ag>"]
 edition = "2021"

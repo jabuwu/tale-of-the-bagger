@@ -7,6 +7,7 @@ use crate::common::AssetCollection;
 #[derive(Default)]
 pub struct AssetLibrary {
     pub textures: TextureAssets,
+    pub fonts: FontAssets,
     pub spines: SpineAssets,
     pub audio: AudioAssets,
 }
@@ -18,6 +19,7 @@ impl AssetLibrary {
         asset_server: &AssetServer,
     ) {
         self.textures.load_assets(skeletons, asset_server);
+        self.fonts.load_assets(skeletons, asset_server);
         self.spines.load_assets(skeletons, asset_server);
         self.audio.load_assets(skeletons, asset_server);
     }
@@ -32,6 +34,12 @@ pub struct TextureAssets {
 
     #[asset("textures/icons/meat.png")]
     pub icon_meat: Handle<Image>,
+}
+
+#[derive(Default, AssetCollection)]
+pub struct FontAssets {
+    #[asset("fonts/FiraSans-Bold.ttf")]
+    pub default: Handle<Font>,
 }
 
 #[derive(Default, AssetCollection)]

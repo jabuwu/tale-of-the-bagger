@@ -15,3 +15,6 @@ pub use game_input::*;
 pub use interactable::*;
 pub use plugins::*;
 pub use transform2::*;
+
+#[cfg(feature = "embedded_assets")]
+pub mod embedded_assets;

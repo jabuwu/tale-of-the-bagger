@@ -10,22 +10,48 @@ use crate::{game::GamePlugin, loading::LoadingPlugin};
 
 pub use crate::{app_state::AppState, asset_library::AssetLibrary};
 
+#[cfg(target_os = "ios")]
+use bevy::window::WindowMode;
+
+#[cfg(feature = "embedded_assets")]
+use common::embedded_assets::EmbeddedAssetIoPlugin;
+
 pub fn game() {
-    App::new()
-        .insert_resource(Msaa { samples: 1 })
+    let mut window_descriptor = WindowDescriptor {
+        title: "Tale of the Bagger: A Love Story".to_string(),
+        canvas: Some("#bevy".to_owned()),
+        fit_canvas_to_parent: true,
+        ..Default::default()
+    };
+
+    #[cfg(target_os = "ios")]
+    {
+        window_descriptor.mode = WindowMode::BorderlessFullscreen;
+        window_descriptor.resizable = false;
+    }
+
+    #[cfg(not(target_os = "ios"))]
+    {
+        window_descriptor.width = 1440.;
+        window_descriptor.height = 810.;
+    }
+
+    let mut app = App::new();
+
+    app.insert_resource(Msaa { samples: 1 })
         .insert_resource(ClearColor(Color::BLACK))
-        .insert_resource(WindowDescriptor {
-            width: 1440.,
-            height: 810.,
-            title: "Tale of the Bagger: A Love Story".to_string(),
-            canvas: Some("#bevy".to_owned()),
-            fit_canvas_to_parent: true,
-            ..Default::default()
-        })
+        .insert_resource(window_descriptor)
         .init_resource::<AssetLibrary>()
-        .add_state(AppState::default())
-        .add_plugins(DefaultPlugins)
-        .add_plugins(CommonPlugins)
+        .add_state(AppState::default());
+
+    #[cfg(not(feature = "embedded_assets"))]
+    app.add_plugins(DefaultPlugins);
+    #[cfg(feature = "embedded_assets")]
+    app.add_plugins_with(DefaultPlugins, |group| {
+        group.add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetIoPlugin)
+    });
+
+    app.add_plugins(CommonPlugins)
         .add_plugin(AudioPlugin)
         .add_plugin(SpinePlugin)
         .add_plugin(LoadingPlugin)
@@ -45,6 +71,12 @@ fn set_window_icon(windows: NonSend<WinitWindows>) {
         let icon = Icon::from_rgba(rgba, width, height).unwrap();
         primary.set_window_icon(Some(icon));
     };
+}
+
+#[cfg(target_os = "ios")]
+#[bevy_main]
+fn main() {
+    game();
 }
 
 pub mod app_state;

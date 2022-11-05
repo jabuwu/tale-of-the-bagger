@@ -3,7 +3,7 @@ use bevy_spine::prelude::*;
 
 use crate::{
     common::{SecondOrderController, SpineSync2},
-    game::ProductSpawnEvent,
+    game::{ProductKind, ProductSpawnEvent},
     AssetLibrary,
 };
 
@@ -46,14 +46,16 @@ fn product_jerky_spawn(
     asset_library: Res<AssetLibrary>,
 ) {
     for event in spawn_events.iter() {
-        commands
-            .entity(event.entity)
-            .insert_bundle(SpineBundle {
-                skeleton: asset_library.spines.product_jerky.clone(),
-                ..Default::default()
-            })
-            .insert(SpineSync2)
-            .insert(ProductJerky);
+        if event.kind == ProductKind::Jerky {
+            commands
+                .entity(event.entity)
+                .insert_bundle(SpineBundle {
+                    skeleton: asset_library.spines.product_jerky.clone(),
+                    ..Default::default()
+                })
+                .insert(SpineSync2)
+                .insert(ProductJerky);
+        }
     }
 }
 

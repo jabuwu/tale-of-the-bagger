@@ -4,7 +4,7 @@ use crate::{common::Transform2, AppState, AssetLibrary};
 
 use super::{
     BagPlugin, BagSpawnEvent, ContainerPlugin, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent,
-    DeskPlugin, DeskSpawnEvent, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND,
+    DeskPlugin, DeskSpawnEvent, ProductKind, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND,
     DEPTH_BACKGROUND_FRONT,
 };
 
@@ -102,6 +102,11 @@ fn game_spawn_products(
         product_spawn_events.send(ProductSpawnEvent {
             entity: commands.spawn().id(),
             position: Vec2::new(-2000., -100.),
+            kind: if rand::random() {
+                ProductKind::Jerky
+            } else {
+                ProductKind::Ketchup
+            },
         });
         local.spawn_time = 1.;
     }

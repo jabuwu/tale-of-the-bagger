@@ -45,6 +45,8 @@ pub struct SpineAssets {
 
     #[spine_asset("spines/products/jerky")]
     pub product_jerky: Handle<SkeletonData>,
+    #[spine_asset("spines/products/ketchup")]
+    pub product_ketchup: Handle<SkeletonData>,
 }
 
 #[derive(Default, AssetCollection)]

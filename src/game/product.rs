@@ -51,19 +51,34 @@ impl Plugin for ProductPlugin {
 pub struct ProductSpawnEvent {
     pub entity: Entity,
     pub position: Vec2,
+    pub kind: ProductKind,
 }
 
 #[derive(Component)]
 pub struct Product {
+    kind: ProductKind,
     scale_controller: SecondOrderController<f32>,
 }
 
 impl Default for Product {
     fn default() -> Self {
         Self {
+            kind: ProductKind::Jerky,
             scale_controller: SecondOrderController::new(1., 4., 0.5, -3.2),
         }
     }
+}
+
+impl Product {
+    pub fn kind(&self) -> ProductKind {
+        self.kind
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ProductKind {
+    Jerky,
+    Ketchup,
 }
 
 #[derive(Component)]
@@ -88,13 +103,15 @@ fn product_spawn(
                 Vec2::ZERO,
             ))
             .with_children(|parent| {
-                parent
-                    .spawn_bundle(SpriteBundle {
-                        texture: asset_library.textures.icon_meat.clone(),
-                        ..Default::default()
-                    })
-                    .insert(Transform2::from_xy(60., -50.).with_scale(Vec2::splat(0.75)))
-                    .insert(DEPTH_PRODUCT_ICON);
+                if event.kind == ProductKind::Jerky {
+                    parent
+                        .spawn_bundle(SpriteBundle {
+                            texture: asset_library.textures.icon_meat.clone(),
+                            ..Default::default()
+                        })
+                        .insert(Transform2::from_xy(60., -50.).with_scale(Vec2::splat(0.75)))
+                        .insert(DEPTH_PRODUCT_ICON);
+                }
             });
     }
 }

@@ -163,8 +163,16 @@ fn product_update(
         product_transform.translation = product_transform
             .translation
             .lerp(destination, time.delta_seconds() * 25.);
+        #[cfg(target_os = "ios")]
+        let drag_scale = 2.;
+        #[cfg(not(target_os = "ios"))]
+        let drag_scale = 1.4;
         product_transform.scale = Vec2::splat(product.scale_controller.update(
-            if product_drag.is_some() { 1.4 } else { 1. },
+            if product_drag.is_some() {
+                drag_scale
+            } else {
+                1.
+            },
             time.delta_seconds(),
         ));
         *product_depth_layer = if product_drag.is_some() {

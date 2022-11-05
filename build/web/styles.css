@@ -21,4 +21,5 @@ body {
 
 #bevy {
     background-color: #111;
+    outline: none;
 }

@@ -6,6 +6,7 @@ mod depths;
 mod desk;
 mod game;
 mod product;
+mod container;
 mod products;
 
 pub use ambience::*;
@@ -16,4 +17,5 @@ pub use depths::*;
 pub use desk::*;
 pub use game::*;
 pub use product::*;
+pub use container::*;
 pub use products::*;

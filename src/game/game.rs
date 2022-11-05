@@ -3,9 +3,9 @@ use bevy::prelude::*;
 use crate::{common::Transform2, AppState, AssetLibrary};
 
 use super::{
-    AmbiencePlugin, BagPlugin, BagSpawnEvent, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent,
-    DeskPlugin, DeskSpawnEvent, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND,
-    DEPTH_BACKGROUND_FRONT,
+    AmbiencePlugin, BagPlugin, BagSpawnEvent, ContainerPlugin, ConveyorPlugin, CustomerPlugin,
+    CustomerSpawnEvent, DeskPlugin, DeskSpawnEvent, ProductPlugin, ProductSpawnEvent,
+    DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
 };
 
 pub struct GamePlugin;
@@ -17,10 +17,13 @@ impl Plugin for GamePlugin {
             .add_plugin(BagPlugin)
             .add_plugin(CustomerPlugin)
             .add_plugin(ProductPlugin)
-            .add_plugin(AmbiencePlugin)
+            .add_plugin(ContainerPlugin)
             .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter))
             .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_customers))
             .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_products));
+
+        #[cfg(not(feature = "dev"))]
+        app.add_plugin(AmbiencePlugin);
     }
 }
 

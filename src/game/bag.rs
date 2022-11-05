@@ -8,7 +8,7 @@ use crate::{
     AssetLibrary,
 };
 
-use super::{ConveyorItem, Product, ProductDropEvent, ProductSystem, DEPTH_BAG};
+use super::{Container, ContainerInserted, ContainerSlot, ContainerSystem, DEPTH_BAG};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
 pub enum BagSystem {
@@ -16,7 +16,7 @@ pub enum BagSystem {
     Spawned,
     Update,
     Hover,
-    ProductDrop,
+    Inserted,
     Clear,
 }
 
@@ -38,15 +38,11 @@ impl Plugin for BagPlugin {
                     .before(SpineSystem::Render),
             )
             .add_system(
-                bag_product_drop
-                    .label(BagSystem::ProductDrop)
-                    .after(ProductSystem::Drag),
+                bag_inserted
+                    .label(BagSystem::Inserted)
+                    .after(ContainerSystem::Insert),
             )
-            .add_system(
-                bag_clear
-                    .label(BagSystem::Clear)
-                    .after(BagSystem::ProductDrop),
-            );
+            .add_system(bag_clear.label(BagSystem::Clear).after(BagSystem::Inserted));
     }
 }
 
@@ -56,14 +52,7 @@ pub struct BagSpawnEvent {
 }
 
 #[derive(Default, Component)]
-pub struct Bag {
-    slots: Vec<BagSlot>,
-}
-
-pub struct BagSlot {
-    slot_entity: Entity,
-    product_entity: Option<Entity>,
-}
+pub struct Bag;
 
 fn bag_spawn(
     mut spawn_events: EventReader<BagSpawnEvent>,
@@ -86,10 +75,10 @@ fn bag_spawn(
 fn bag_spawned(
     mut spine_ready_event: EventReader<SpineReadyEvent>,
     mut commands: Commands,
-    mut bag_query: Query<(Entity, &mut Bag, &Spine)>,
+    bag_query: Query<(Entity, &Spine), With<Bag>>,
 ) {
     for event in spine_ready_event.iter() {
-        if let Some((bag_entity, mut bag, bag_spine)) = bag_query.get_mut(event.entity).ok() {
+        if let Some((bag_entity, bag_spine)) = bag_query.get(event.entity).ok() {
             if let Some(bounds) = bag_spine
                 .skeleton
                 .find_slot("bounds")
@@ -111,13 +100,15 @@ fn bag_spawned(
                     aabb.translation,
                 ));
             }
+            let mut container = Container::default();
             for slot_name in ["slot1", "slot2", "slot3"].into_iter() {
                 let slot_entity = *event.bones.get(slot_name).unwrap();
-                bag.slots.push(BagSlot {
+                container.slots.push(ContainerSlot {
                     slot_entity,
                     product_entity: None,
                 });
             }
+            commands.entity(bag_entity).insert(container);
         }
     }
 }
@@ -136,54 +127,35 @@ fn bag_update(
     }
 }
 
-fn bag_product_drop(
-    mut drop_events: EventReader<ProductDropEvent>,
-    mut product_query: Query<(Entity, &mut Transform2), With<Product>>,
-    mut bag_query: Query<(&mut Bag, &mut Spine, &Interactable)>,
-    mut commands: Commands,
+fn bag_inserted(
+    mut inserted_events: EventReader<ContainerInserted>,
+    mut bag_query: Query<&mut Spine>,
     audio: Res<Audio>,
     asset_library: Res<AssetLibrary>,
 ) {
-    for event in drop_events.iter() {
-        if let Some((product_entity, mut product_transform)) =
-            product_query.get_mut(event.entity).ok()
-        {
-            for (mut bag, mut bag_spine, bag_interactable) in bag_query.iter_mut() {
-                if bag_interactable.contains_point(event.position) {
-                    for slot in bag.slots.iter_mut() {
-                        if slot.product_entity.is_none() {
-                            let _ = bag_spine.animation_state.set_animation_by_name(
-                                0,
-                                "animation",
-                                false,
-                            );
-                            commands.entity(product_entity).remove::<ConveyorItem>();
-                            commands.entity(slot.slot_entity).add_child(product_entity);
-                            product_transform.translation = Vec2::ZERO;
-                            slot.product_entity = Some(product_entity);
-                            audio.play(
-                                [
-                                    asset_library.audio.bag_insert_1.clone(),
-                                    asset_library.audio.bag_insert_2.clone(),
-                                    asset_library.audio.bag_insert_3.clone(),
-                                    asset_library.audio.bag_insert_4.clone(),
-                                    asset_library.audio.bag_insert_5.clone(),
-                                    asset_library.audio.bag_insert_6.clone(),
-                                    asset_library.audio.bag_insert_7.clone(),
-                                    asset_library.audio.bag_insert_8.clone(),
-                                    asset_library.audio.bag_insert_9.clone(),
-                                    asset_library.audio.bag_insert_10.clone(),
-                                    asset_library.audio.bag_insert_11.clone(),
-                                ]
-                                .choose(&mut thread_rng())
-                                .unwrap()
-                                .clone(),
-                            );
-                            break;
-                        }
-                    }
-                }
-            }
+    for event in inserted_events.iter() {
+        if let Some(mut bag_spine) = bag_query.get_mut(event.container).ok() {
+            let _ = bag_spine
+                .animation_state
+                .set_animation_by_name(0, "animation", false);
+            audio.play(
+                [
+                    asset_library.audio.bag_insert_1.clone(),
+                    asset_library.audio.bag_insert_2.clone(),
+                    asset_library.audio.bag_insert_3.clone(),
+                    asset_library.audio.bag_insert_4.clone(),
+                    asset_library.audio.bag_insert_5.clone(),
+                    asset_library.audio.bag_insert_6.clone(),
+                    asset_library.audio.bag_insert_7.clone(),
+                    asset_library.audio.bag_insert_8.clone(),
+                    asset_library.audio.bag_insert_9.clone(),
+                    asset_library.audio.bag_insert_10.clone(),
+                    asset_library.audio.bag_insert_11.clone(),
+                ]
+                .choose(&mut thread_rng())
+                .unwrap()
+                .clone(),
+            );
         }
     }
 }
@@ -194,22 +166,22 @@ struct BagClearLocal {
 }
 
 fn bag_clear(
-    mut bag_query: Query<&mut Bag>,
+    mut bag_query: Query<&mut Container, With<Bag>>,
     mut commands: Commands,
     mut local: Local<BagClearLocal>,
     asset_library: Res<AssetLibrary>,
     audio: Res<Audio>,
 ) {
-    for mut bag in bag_query.iter_mut() {
-        if bag.slots.len() > 0
-            && bag
+    for mut bag_container in bag_query.iter_mut() {
+        if bag_container.slots.len() > 0
+            && bag_container
                 .slots
-                .get(bag.slots.len() - 1)
+                .get(bag_container.slots.len() - 1)
                 .unwrap()
                 .product_entity
                 .is_some()
         {
-            for slot in bag.slots.iter_mut() {
+            for slot in bag_container.slots.iter_mut() {
                 if let Some(product_entity) = slot.product_entity {
                     commands.entity(product_entity).despawn_recursive();
                 }

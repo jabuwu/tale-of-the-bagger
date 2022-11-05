@@ -8,8 +8,8 @@ use crate::{
 };
 
 use super::{
-    BagSystem, ConveyorItem, ConveyorSystem, ProductPlugins, DEPTH_PRODUCT, DEPTH_PRODUCT_DRAGGING,
-    DEPTH_PRODUCT_ICON,
+    Container, ContainerInsert, ContainerInserted, ContainerSystem, ConveyorItem, ConveyorSystem,
+    ProductPlugins, DEPTH_PRODUCT, DEPTH_PRODUCT_DRAGGING, DEPTH_PRODUCT_ICON,
 };
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
@@ -17,6 +17,8 @@ pub enum ProductSystem {
     Spawn,
     Update,
     Drag,
+    Drop,
+    Inserted,
 }
 
 pub struct ProductPlugin;
@@ -25,15 +27,24 @@ impl Plugin for ProductPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(ProductPlugins)
             .add_event::<ProductSpawnEvent>()
-            .add_event::<ProductDropEvent>()
             .add_system(product_spawn.label(ProductSystem::Spawn))
             .add_system(
                 product_update
                     .label(ProductSystem::Update)
                     .after(ConveyorSystem::ItemUpdate)
-                    .before(BagSystem::ProductDrop),
+                    .before(ProductSystem::Inserted),
             )
-            .add_system(product_drag.label(ProductSystem::Drag));
+            .add_system(product_drag.label(ProductSystem::Drag))
+            .add_system(
+                product_drop
+                    .label(ProductSystem::Drop)
+                    .before(ProductSystem::Drag),
+            )
+            .add_system(
+                product_inserted
+                    .label(ProductSystem::Inserted)
+                    .after(ContainerSystem::Insert),
+            );
     }
 }
 
@@ -56,13 +67,7 @@ impl Default for Product {
 }
 
 #[derive(Component)]
-pub struct ProductDrag(u64);
-
-#[derive(Debug)]
-pub struct ProductDropEvent {
-    pub entity: Entity,
-    pub position: Vec2,
-}
+pub struct ProductDrag(pub u64);
 
 fn product_spawn(
     mut spawn_events: EventReader<ProductSpawnEvent>,
@@ -101,7 +106,9 @@ fn product_update(
         &mut DepthLayer,
         Option<&ConveyorItem>,
         Option<&ProductDrag>,
+        Option<&Parent>,
     )>,
+    global_transform_query: Query<&GlobalTransform>,
     game_input: Res<GameInput>,
     time: Res<Time>,
 ) {
@@ -111,11 +118,25 @@ fn product_update(
         mut product_depth_layer,
         product_conveyor_item,
         product_drag,
+        product_parent,
     ) in product_query.iter_mut()
     {
-        let destination = if let Some(drag_position) =
-            product_drag.and_then(|drag| game_input.drag_position(drag.0))
-        {
+        let parent_translation = if let Some(product_parent) = product_parent {
+            if let Some(product_parent_transform) =
+                global_transform_query.get(product_parent.get()).ok()
+            {
+                product_parent_transform.translation().truncate()
+            } else {
+                Vec2::ZERO
+            }
+        } else {
+            Vec2::ZERO
+        };
+        let destination = if let Some(drag_position) = product_drag.and_then(|drag| {
+            game_input
+                .drag_position(drag.0)
+                .map(|position| position - parent_translation)
+        }) {
             drag_position
         } else if let Some(product_conveyor_item) = product_conveyor_item {
             product_conveyor_item.position
@@ -139,12 +160,10 @@ fn product_update(
 
 fn product_drag(
     mut commands: Commands,
-    mut drop_events: EventWriter<ProductDropEvent>,
     product_query: Query<
         (Entity, &Interactable),
         (With<Product>, With<ConveyorItem>, Without<ProductDrag>),
     >,
-    product_drag_query: Query<(Entity, &ProductDrag)>,
     game_input: Res<GameInput>,
 ) {
     for (product_entity, product_interactable) in product_query.iter() {
@@ -153,13 +172,40 @@ fn product_drag(
             break;
         }
     }
+}
+
+fn product_drop(
+    mut commands: Commands,
+    mut attach_events: EventWriter<ContainerInsert>,
+    product_drag_query: Query<(Entity, &ProductDrag)>,
+    container_query: Query<(Entity, &Interactable), With<Container>>,
+    game_input: Res<GameInput>,
+) {
     for (product_drag_entity, product_drag) in product_drag_query.iter() {
         if game_input.drag_ended(product_drag.0) {
+            for (container_entity, container_interactable) in container_query.iter() {
+                if container_interactable.hovered(game_input.as_ref()) {
+                    attach_events.send(ContainerInsert {
+                        container: container_entity,
+                        product: product_drag_entity,
+                    });
+                    break;
+                }
+            }
             commands.entity(product_drag_entity).remove::<ProductDrag>();
-            drop_events.send(ProductDropEvent {
-                entity: product_drag_entity,
-                position: game_input.drag_position(product_drag.0).unwrap(),
-            });
+        }
+    }
+}
+
+fn product_inserted(
+    mut inserted_events: EventReader<ContainerInserted>,
+    mut commands: Commands,
+    mut transform_query: Query<&mut Transform2>,
+) {
+    for event in inserted_events.iter() {
+        commands.entity(event.product).remove::<ConveyorItem>();
+        if let Some(mut product_transform) = transform_query.get_mut(event.product).ok() {
+            product_transform.translation = Vec2::ZERO;
         }
     }
 }

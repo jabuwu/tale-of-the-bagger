@@ -62,6 +62,14 @@ impl Interactable {
             None
         }
     }
+
+    pub fn dragging_within(&self, game_input: &GameInput, drag_id: u64) -> bool {
+        if let Some(drag_position) = game_input.drag_position(drag_id) {
+            self.contains_point(drag_position)
+        } else {
+            false
+        }
+    }
 }
 
 fn interactable_update(mut interactable_query: Query<(&mut Interactable, &GlobalTransform)>) {

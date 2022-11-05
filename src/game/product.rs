@@ -184,7 +184,7 @@ fn product_drop(
     for (product_drag_entity, product_drag) in product_drag_query.iter() {
         if game_input.drag_ended(product_drag.0) {
             for (container_entity, container_interactable) in container_query.iter() {
-                if container_interactable.hovered(game_input.as_ref()) {
+                if container_interactable.dragging_within(game_input.as_ref(), product_drag.0) {
                     attach_events.send(ContainerInsert {
                         container: container_entity,
                         product: product_drag_entity,

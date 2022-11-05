@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use lerp::Lerp;
 
 use crate::{common::Transform2, AppState, AssetLibrary};
 
@@ -78,10 +79,23 @@ fn game_spawn_customers(
 ) {
     local.spawn_time -= time.delta_seconds();
     if local.spawn_time <= 0. {
-        customer_spawn_events.send(CustomerSpawnEvent {
-            position: Vec2::new(-1100., -125.),
-            ..Default::default()
-        });
+        if rand::random() {
+            customer_spawn_events.send(CustomerSpawnEvent {
+                position: Vec2::new(-1100., 100.0_f32.lerp(200., rand::random::<f32>())),
+                scale: 0.7,
+                speed: 100.,
+                silhouette: true,
+                ..Default::default()
+            });
+        } else {
+            customer_spawn_events.send(CustomerSpawnEvent {
+                position: Vec2::new(-1100., -125.0_f32.lerp(300., rand::random::<f32>())),
+                scale: 1.,
+                speed: 150.,
+                silhouette: false,
+                ..Default::default()
+            });
+        }
         local.spawn_time = 17.;
     }
 }

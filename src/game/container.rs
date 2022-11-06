@@ -43,10 +43,20 @@ pub struct ContainerInserted {
 pub struct Container {
     pub slots: Vec<ContainerSlot>,
     pub products: Vec<ProductKind>,
+    pub drop_candidates: Vec<ProductKind>,
 }
 
 impl Container {
     pub fn valid_stack(&self) -> bool {
+        ProductKind::valid_stack(&self.products)
+    }
+
+    pub fn valid_stack_with_candidates(&self) -> bool {
+        for drop_candidate in self.drop_candidates.iter() {
+            if !ProductKind::valid_stack(&[self.products.clone(), vec![*drop_candidate]].concat()) {
+                return false;
+            }
+        }
         ProductKind::valid_stack(&self.products)
     }
 }

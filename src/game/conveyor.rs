@@ -34,7 +34,7 @@ pub struct Conveyor {
 
 impl Default for Conveyor {
     fn default() -> Self {
-        Self { x: 0., speed: 200. }
+        Self { x: 0., speed: 100. }
     }
 }
 

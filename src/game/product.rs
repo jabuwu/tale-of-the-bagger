@@ -19,6 +19,7 @@ pub enum ProductSystem {
     Drag,
     Drop,
     Inserted,
+    DropCandidates,
 }
 
 pub struct ProductPlugin;
@@ -43,6 +44,11 @@ impl Plugin for ProductPlugin {
             .add_system(
                 product_inserted
                     .label(ProductSystem::Inserted)
+                    .after(ContainerSystem::Insert),
+            )
+            .add_system(
+                product_drop_candidates
+                    .label(ProductSystem::DropCandidates)
                     .after(ContainerSystem::Insert),
             );
     }
@@ -229,6 +235,27 @@ fn product_inserted(
         commands.entity(event.product).remove::<ConveyorItem>();
         if let Some(mut product_transform) = transform_query.get_mut(event.product).ok() {
             product_transform.translation = Vec2::ZERO;
+        }
+    }
+}
+
+fn product_drop_candidates(
+    mut container_query: Query<(&mut Container, &Interactable)>,
+    product_drag_query: Query<(Entity, &Product, &ProductDrag)>,
+    game_input: Res<GameInput>,
+) {
+    for (mut container, container_interactable) in container_query.iter_mut() {
+        container.drop_candidates = vec![];
+        for (product_entity, product, product_drag) in product_drag_query.iter() {
+            if container_interactable.dragging_within(game_input.as_ref(), product_drag.0) {
+                if !container.slots.iter().any(|slot| {
+                    slot.product_entity
+                        .map(|entity| entity == product_entity)
+                        .unwrap_or(false)
+                }) {
+                    container.drop_candidates.push(product.kind());
+                }
+            }
         }
     }
 }

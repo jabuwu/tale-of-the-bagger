@@ -120,6 +120,6 @@ fn game_spawn_products(
             position: Vec2::new(-2000., -100.),
             kind: ProductKind::iter().choose(&mut thread_rng()).unwrap(),
         });
-        local.spawn_time = 1.;
+        local.spawn_time = 1.5;
     }
 }

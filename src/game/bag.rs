@@ -8,7 +8,9 @@ use crate::{
     AssetLibrary,
 };
 
-use super::{Container, ContainerInserted, ContainerSlot, ContainerSystem, DEPTH_BAG};
+use super::{
+    Container, ContainerInserted, ContainerSlot, ContainerSystem, ProductSystem, DEPTH_BAG,
+};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
 pub enum BagSystem {
@@ -35,6 +37,7 @@ impl Plugin for BagPlugin {
                 bag_update
                     .label(BagSystem::Update)
                     .after(SpineSystem::Update)
+                    .after(ProductSystem::DropCandidates)
                     .before(SpineSystem::Render),
             )
             .add_system(
@@ -118,7 +121,7 @@ fn bag_update(
     game_input: Res<GameInput>,
 ) {
     for (mut bag_spine, bag_container, bag_interactable) in bag_query.iter_mut() {
-        let mut color = if bag_container.valid_stack() {
+        let mut color = if bag_container.valid_stack_with_candidates() {
             Color::WHITE
         } else {
             Color::RED

@@ -5,7 +5,7 @@ use crate::{
     game::ProductDrag,
 };
 
-use super::ProductSystem;
+use super::{Product, ProductKind, ProductSystem};
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
 pub enum ContainerSystem {
@@ -42,6 +42,13 @@ pub struct ContainerInserted {
 #[derive(Default, Component)]
 pub struct Container {
     pub slots: Vec<ContainerSlot>,
+    pub products: Vec<ProductKind>,
+}
+
+impl Container {
+    pub fn valid_stack(&self) -> bool {
+        ProductKind::valid_stack(&self.products)
+    }
 }
 
 pub struct ContainerSlot {
@@ -54,6 +61,7 @@ fn container_insert(
     mut insert_events: EventReader<ContainerInsert>,
     mut inserted_events: EventWriter<ContainerInserted>,
     mut container_query: Query<(Entity, &mut Container)>,
+    product_query: Query<&Product>,
 ) {
     for event in insert_events.iter() {
         let mut inserted = false;
@@ -78,9 +86,24 @@ fn container_insert(
                     break;
                 }
             }
+            if inserted {
+                let mut products = vec![];
+                for slot in container.slots.iter() {
+                    if let Some(product) = slot
+                        .product_entity
+                        .and_then(|entity| product_query.get(entity).ok())
+                    {
+                        products.push(product.kind());
+                    } else {
+                        break;
+                    }
+                }
+                container.products = products;
+            }
         }
         if inserted {
             for (container_entity, mut container) in container_query.iter_mut() {
+                let mut updated = false;
                 if container_entity != event.container {
                     for mut slot in container.slots.iter_mut() {
                         if slot
@@ -89,8 +112,23 @@ fn container_insert(
                             .unwrap_or(false)
                         {
                             slot.product_entity = None;
+                            updated = true;
                         }
                     }
+                }
+                if updated {
+                    let mut products = vec![];
+                    for slot in container.slots.iter() {
+                        if let Some(product) = slot
+                            .product_entity
+                            .and_then(|entity| product_query.get(entity).ok())
+                        {
+                            products.push(product.kind());
+                        } else {
+                            break;
+                        }
+                    }
+                    container.products = products;
                 }
             }
         }

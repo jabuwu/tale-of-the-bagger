@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use lerp::Lerp;
+use rand::{seq::IteratorRandom, thread_rng};
+use strum::IntoEnumIterator;
 
 use crate::{common::Transform2, AppState, AssetLibrary};
 
@@ -116,11 +118,7 @@ fn game_spawn_products(
         product_spawn_events.send(ProductSpawnEvent {
             entity: commands.spawn().id(),
             position: Vec2::new(-2000., -100.),
-            kind: if rand::random() {
-                ProductKind::Jerky
-            } else {
-                ProductKind::Ketchup
-            },
+            kind: ProductKind::iter().choose(&mut thread_rng()).unwrap(),
         });
         local.spawn_time = 1.;
     }

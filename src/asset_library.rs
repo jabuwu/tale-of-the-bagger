@@ -32,8 +32,22 @@ pub struct TextureAssets {
     #[asset("textures/background_front.png")]
     pub background_front: Handle<Image>,
 
+    #[asset("textures/icons/cold.png")]
+    pub icon_cold: Handle<Image>,
+    #[asset("textures/icons/hot.png")]
+    pub icon_hot: Handle<Image>,
+    #[asset("textures/icons/fresh.png")]
+    pub icon_fresh: Handle<Image>,
     #[asset("textures/icons/meat.png")]
     pub icon_meat: Handle<Image>,
+    #[asset("textures/icons/fragile.png")]
+    pub icon_fragile: Handle<Image>,
+    #[asset("textures/icons/heavy.png")]
+    pub icon_heavy: Handle<Image>,
+    #[asset("textures/icons/toxic.png")]
+    pub icon_toxic: Handle<Image>,
+    #[asset("textures/icons/illicit.png")]
+    pub icon_illicit: Handle<Image>,
 }
 
 #[derive(Default, AssetCollection)]
@@ -118,4 +132,7 @@ pub struct AudioAssets {
     pub bag_clear_success_2: Handle<AudioSource>,
     #[asset("audio/bag_clear_success_3.ogg")]
     pub bag_clear_success_3: Handle<AudioSource>,
+
+    #[asset("audio/bag_clear_error.ogg")]
+    pub bag_clear_error: Handle<AudioSource>,
 }

@@ -114,16 +114,21 @@ fn bag_spawned(
 }
 
 fn bag_update(
-    mut bag_query: Query<(&mut Spine, &Interactable), With<Bag>>,
+    mut bag_query: Query<(&mut Spine, &Container, &Interactable), With<Bag>>,
     game_input: Res<GameInput>,
 ) {
-    for (mut bag_spine, bag_interactable) in bag_query.iter_mut() {
+    for (mut bag_spine, bag_container, bag_interactable) in bag_query.iter_mut() {
+        let mut color = if bag_container.valid_stack() {
+            Color::WHITE
+        } else {
+            Color::RED
+        };
+        if bag_interactable.hovered(game_input.as_ref()) {
+            color *= 1.3;
+        }
+        color.set_a(1.);
         *bag_spine.skeleton.find_slot_mut("bag").unwrap().color_mut() =
-            if bag_interactable.hovered(game_input.as_ref()) {
-                bevy_spine::Color::new_rgba(1.3, 1.3, 1.3, 1.)
-            } else {
-                bevy_spine::Color::new_rgba(1., 1., 1., 1.)
-            };
+            bevy_spine::Color::new_rgba(color.r(), color.g(), color.b(), color.a());
     }
 }
 
@@ -165,6 +170,7 @@ struct BagClearLocal {
     audio_track: usize,
 }
 
+// TODO: some of this logic should probably be controlled by container and not bag
 fn bag_clear(
     mut bag_query: Query<&mut Container, With<Bag>>,
     mut commands: Commands,
@@ -187,18 +193,23 @@ fn bag_clear(
                 }
                 slot.product_entity = None;
             }
-            audio.play(
-                [
-                    asset_library.audio.bag_clear_success_1.clone(),
-                    asset_library.audio.bag_clear_success_2.clone(),
-                    asset_library.audio.bag_clear_success_3.clone(),
-                ]
-                .into_iter()
-                .nth(local.audio_track)
-                .unwrap()
-                .clone(),
-            );
-            local.audio_track = (local.audio_track + 1) % 3;
+            if bag_container.valid_stack() {
+                audio.play(
+                    [
+                        asset_library.audio.bag_clear_success_1.clone(),
+                        asset_library.audio.bag_clear_success_2.clone(),
+                        asset_library.audio.bag_clear_success_3.clone(),
+                    ]
+                    .into_iter()
+                    .nth(local.audio_track)
+                    .unwrap()
+                    .clone(),
+                );
+                local.audio_track = (local.audio_track + 1) % 3;
+            } else {
+                audio.play(asset_library.audio.bag_clear_error.clone());
+            }
+            bag_container.products = vec![];
         }
     }
 }

@@ -44,7 +44,7 @@ fn product_ketchup_spawn(
     asset_library: Res<AssetLibrary>,
 ) {
     for event in spawn_events.iter() {
-        if event.kind == ProductKind::Ketchup {
+        if event.kind != ProductKind::Jerky {
             commands
                 .entity(event.entity)
                 .insert_bundle(SpineBundle {

@@ -9,7 +9,7 @@ use crate::{
 
 use super::{
     Container, ContainerInsert, ContainerInserted, ContainerSystem, ConveyorItem, ConveyorSystem,
-    ProductPlugins, DEPTH_PRODUCT, DEPTH_PRODUCT_DRAGGING, DEPTH_PRODUCT_ICON,
+    ProductKind, ProductPlugins, DEPTH_PRODUCT, DEPTH_PRODUCT_DRAGGING, DEPTH_PRODUCT_ICON,
 };
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
@@ -60,25 +60,17 @@ pub struct Product {
     scale_controller: SecondOrderController<f32>,
 }
 
-impl Default for Product {
-    fn default() -> Self {
+impl Product {
+    pub fn new(kind: ProductKind) -> Self {
         Self {
-            kind: ProductKind::Jerky,
+            kind,
             scale_controller: SecondOrderController::new(1., 4., 0.5, -3.2),
         }
     }
-}
 
-impl Product {
     pub fn kind(&self) -> ProductKind {
         self.kind
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum ProductKind {
-    Jerky,
-    Ketchup,
 }
 
 #[derive(Component)]
@@ -94,7 +86,7 @@ fn product_spawn(
             .entity(event.entity)
             .insert(Transform2::from_translation(event.position))
             .insert(DEPTH_PRODUCT)
-            .insert(Product::default())
+            .insert(Product::new(event.kind))
             .insert(ConveyorItem::default())
             .insert(Interactable::new(
                 CollisionShape::Aabb {
@@ -103,14 +95,20 @@ fn product_spawn(
                 Vec2::ZERO,
             ))
             .with_children(|parent| {
-                if event.kind == ProductKind::Jerky {
+                let attributes = event.kind.attributes();
+
+                let mut y_offset = 0.;
+                for attribute in attributes.enums() {
                     parent
                         .spawn_bundle(SpriteBundle {
-                            texture: asset_library.textures.icon_meat.clone(),
+                            texture: attribute.icon(asset_library.as_ref()),
                             ..Default::default()
                         })
-                        .insert(Transform2::from_xy(60., -50.).with_scale(Vec2::splat(0.75)))
+                        .insert(
+                            Transform2::from_xy(60., -50. + y_offset).with_scale(Vec2::splat(0.75)),
+                        )
                         .insert(DEPTH_PRODUCT_ICON);
+                    y_offset += 40.;
                 }
             });
     }

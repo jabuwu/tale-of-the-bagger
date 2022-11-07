@@ -9,7 +9,8 @@ use crate::{
 };
 
 use super::{
-    Container, ContainerInserted, ContainerSlot, ContainerSystem, ProductSystem, DEPTH_BAG,
+    Container, ContainerInserted, ContainerSlot, ContainerSystem, HealthDamageEvent, ProductSystem,
+    DEPTH_BAG,
 };
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
@@ -178,6 +179,7 @@ fn bag_clear(
     mut bag_query: Query<&mut Container, With<Bag>>,
     mut commands: Commands,
     mut local: Local<BagClearLocal>,
+    mut health_damage_events: EventWriter<HealthDamageEvent>,
     asset_library: Res<AssetLibrary>,
     audio: Res<Audio>,
 ) {
@@ -210,7 +212,7 @@ fn bag_clear(
                 );
                 local.audio_track = (local.audio_track + 1) % 3;
             } else {
-                audio.play(asset_library.audio.bag_clear_error.clone());
+                health_damage_events.send_default();
             }
             bag_container.products = vec![];
         }

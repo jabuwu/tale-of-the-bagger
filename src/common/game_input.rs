@@ -173,7 +173,10 @@ fn game_input_update(
     }
 
     if let Some(cursor_position) = game_input.cursor_position {
-        if mouse_buttons.just_pressed(MouseButton::Left) && !has_touch {
+        if (mouse_buttons.just_pressed(MouseButton::Left)
+            && !mouse_buttons.just_released(MouseButton::Left))
+            && !has_touch
+        {
             let id = game_input.next_drag_id();
             game_input.drags.push(GameInputDrag::new(
                 id,

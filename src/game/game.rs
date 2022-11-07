@@ -7,8 +7,8 @@ use crate::{common::Transform2, AppState, AssetLibrary};
 
 use super::{
     BagPlugin, BagSpawnEvent, ContainerPlugin, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent,
-    DeskPlugin, DeskSpawnEvent, ProductKind, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND,
-    DEPTH_BACKGROUND_FRONT,
+    DeskPlugin, DeskSpawnEvent, HealthIconSpawnEvent, HealthPlugin, ProductKind, ProductPlugin,
+    ProductSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
 };
 
 pub struct GamePlugin;
@@ -21,6 +21,7 @@ impl Plugin for GamePlugin {
             .add_plugin(CustomerPlugin)
             .add_plugin(ProductPlugin)
             .add_plugin(ContainerPlugin)
+            .add_plugin(HealthPlugin)
             .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter))
             .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_customers))
             .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_products));
@@ -34,6 +35,7 @@ fn game_enter(
     mut commands: Commands,
     mut desk_spawn_events: EventWriter<DeskSpawnEvent>,
     mut bag_spawn_events: EventWriter<BagSpawnEvent>,
+    mut health_spawn_events: EventWriter<HealthIconSpawnEvent>,
     asset_library: Res<AssetLibrary>,
 ) {
     commands.spawn_bundle(Camera2dBundle::default());
@@ -67,6 +69,14 @@ fn game_enter(
         position: Vec2::new(387., -253.),
         ..Default::default()
     });
+
+    for i in 0..4 {
+        let x = 870. - i as f32 * 90.;
+        health_spawn_events.send(HealthIconSpawnEvent {
+            position: Vec2::new(x, 450.),
+            threshold: i + 1,
+        });
+    }
 }
 
 #[derive(Default)]

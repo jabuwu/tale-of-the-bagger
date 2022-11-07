@@ -3,6 +3,8 @@ use bevy_spine::prelude::*;
 
 use crate::common::{SpineSync2, Transform2};
 
+use super::HealthDamageEvent;
+
 #[derive(Debug, Hash, PartialEq, Eq, Clone, SystemLabel)]
 pub enum ConveyorSystem {
     Update,
@@ -54,6 +56,7 @@ pub struct ConveyorItem {
 fn conveyor_item_update(
     mut conveyor_item_query: Query<(Entity, &mut ConveyorItem)>,
     mut commands: Commands,
+    mut health_damage_events: EventWriter<HealthDamageEvent>,
     conveyor_query: Query<(&Conveyor, &GlobalTransform)>,
     time: Res<Time>,
 ) {
@@ -69,6 +72,7 @@ fn conveyor_item_update(
         conveyor_item.position = Vec2::new(-1066. + conveyor_item.progress, -387.);
         if conveyor_item.progress > 1666. {
             commands.entity(conveyor_entity).despawn_recursive();
+            health_damage_events.send_default();
         }
     }
 }

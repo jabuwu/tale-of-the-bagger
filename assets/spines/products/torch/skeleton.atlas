@@ -1,0 +1,7 @@
+skeleton.png
+size:129,152
+filter:Linear,Linear
+pma:true
+torch
+bounds:2,2,125,148
+offsets:22,16,171,171

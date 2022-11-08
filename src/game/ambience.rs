@@ -9,8 +9,7 @@ pub struct AmbiencePlugin;
 
 impl Plugin for AmbiencePlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(AppState::Game).with_system(ambience_setup))
-            .add_system_set(SystemSet::on_update(AppState::Game).with_system(ambience_update));
+        app.add_system(ambience_update);
     }
 }
 
@@ -22,6 +21,7 @@ pub enum AmbienceKind {
 }
 
 pub struct AmbienceUpdateLocal {
+    first: bool,
     wait_time: f32,
     last_ambience: AmbienceKind,
 }
@@ -29,14 +29,11 @@ pub struct AmbienceUpdateLocal {
 impl Default for AmbienceUpdateLocal {
     fn default() -> Self {
         Self {
+            first: true,
             wait_time: 5.,
             last_ambience: AmbienceKind::Announcement,
         }
     }
-}
-
-fn ambience_setup(audio: Res<Audio>, asset_library: Res<AssetLibrary>) {
-    audio.play(asset_library.audio.ambience.clone()).looped();
 }
 
 fn ambience_update(
@@ -44,8 +41,15 @@ fn ambience_update(
     time: Res<Time>,
     asset_library: Res<AssetLibrary>,
     audio: Res<Audio>,
+    state: Res<State<AppState>>,
 ) {
-    local.wait_time -= time.delta_seconds();
+    if local.first && *state.current() != AppState::Loading {
+        audio.play(asset_library.audio.ambience.clone()).looped();
+        local.first = false;
+    }
+    if *state.current() == AppState::Game {
+        local.wait_time -= time.delta_seconds();
+    }
     if local.wait_time <= 0. {
         let mut rng = thread_rng();
         if local.last_ambience == AmbienceKind::DingDong {

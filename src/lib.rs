@@ -6,7 +6,7 @@ use bevy_spine::prelude::*;
 use common::CommonPlugins;
 use winit::window::Icon;
 
-use crate::{game::GamePlugin, loading::LoadingPlugin};
+use crate::{game::GameStatePlugin, loading::LoadingStatePlugin, menu::MenuStatePlugin};
 
 pub use crate::{app_state::AppState, asset_library::AssetLibrary};
 
@@ -54,8 +54,9 @@ pub fn game() {
     app.add_plugins(CommonPlugins)
         .add_plugin(AudioPlugin)
         .add_plugin(SpinePlugin)
-        .add_plugin(LoadingPlugin)
-        .add_plugin(GamePlugin)
+        .add_plugin(LoadingStatePlugin)
+        .add_plugin(GameStatePlugin)
+        .add_plugin(MenuStatePlugin)
         .add_startup_system(set_window_icon)
         .run();
 }
@@ -84,3 +85,4 @@ pub mod asset_library;
 pub mod common;
 pub mod game;
 pub mod loading;
+pub mod menu;

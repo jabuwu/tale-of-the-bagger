@@ -6,14 +6,14 @@ use strum::IntoEnumIterator;
 use crate::{common::Transform2, AppState, AssetLibrary};
 
 use super::{
-    BagPlugin, BagSpawnEvent, ContainerPlugin, ConveyorPlugin, CustomerPlugin, CustomerSpawnEvent,
-    DeskPlugin, DeskSpawnEvent, HealthIconSpawnEvent, HealthPlugin, ProductKind, ProductPlugin,
-    ProductSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
+    BagPlugin, BagSpawnEvent, BagSystem, ContainerPlugin, ConveyorPlugin, CustomerPlugin,
+    CustomerSpawnEvent, DeskPlugin, DeskSpawnEvent, HealthIconSpawnEvent, HealthPlugin,
+    ProductKind, ProductPlugin, ProductSpawnEvent, DEPTH_BACKGROUND, DEPTH_BACKGROUND_FRONT,
 };
 
-pub struct GamePlugin;
+pub struct GameStatePlugin;
 
-impl Plugin for GamePlugin {
+impl Plugin for GameStatePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(DeskPlugin)
             .add_plugin(ConveyorPlugin)
@@ -22,9 +22,14 @@ impl Plugin for GamePlugin {
             .add_plugin(ProductPlugin)
             .add_plugin(ContainerPlugin)
             .add_plugin(HealthPlugin)
-            .add_system_set(SystemSet::on_enter(AppState::Game).with_system(game_enter))
+            .add_system_set(
+                SystemSet::on_enter(AppState::Game)
+                    .with_system(game_enter)
+                    .before(BagSystem::Spawn),
+            )
             .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_customers))
-            .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_products));
+            .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_spawn_products))
+            .add_system_set(SystemSet::on_update(AppState::Game).with_system(game_esc_to_menu));
 
         #[cfg(not(feature = "dev"))]
         app.add_plugin(super::AmbiencePlugin);
@@ -131,5 +136,12 @@ fn game_spawn_products(
             kind: ProductKind::iter().choose(&mut thread_rng()).unwrap(),
         });
         local.spawn_time = 1.5;
+    }
+}
+
+fn game_esc_to_menu(mut app_state: ResMut<State<AppState>>, mut input: ResMut<Input<KeyCode>>) {
+    if input.just_pressed(KeyCode::Escape) {
+        let _ = app_state.set(AppState::Menu);
+        input.reset(KeyCode::Escape);
     }
 }

@@ -1,6 +1,6 @@
 use bevy::{prelude::*, transform::TransformSystem};
 
-use super::transform2::Transform2System;
+use super::{transform2::Transform2System, Persistent};
 
 const DESIRED_SIZE: Vec2 = Vec2::new(1920., 1080.);
 const DESIRED_RATIO: f32 = DESIRED_SIZE.x / DESIRED_SIZE.y;
@@ -22,42 +22,50 @@ impl Plugin for ForceCameraRatioPlugin {
 }
 
 fn force_camera_ratio_setup(mut commands: Commands) {
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
-            color: Color::BLACK,
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
+                color: Color::BLACK,
+                ..Default::default()
+            },
+            transform: Transform::from_xyz(DESIRED_SIZE.x * 0.5 + RATIO_BAR_SIZE * 0.5, 0., 1.),
             ..Default::default()
-        },
-        transform: Transform::from_xyz(DESIRED_SIZE.x * 0.5 + RATIO_BAR_SIZE * 0.5, 0., 1.),
-        ..Default::default()
-    });
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
-            color: Color::BLACK,
+        })
+        .insert(Persistent);
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
+                color: Color::BLACK,
+                ..Default::default()
+            },
+            transform: Transform::from_xyz(DESIRED_SIZE.x * -0.5 - RATIO_BAR_SIZE * 0.5, 0., 1.),
             ..Default::default()
-        },
-        transform: Transform::from_xyz(DESIRED_SIZE.x * -0.5 - RATIO_BAR_SIZE * 0.5, 0., 1.),
-        ..Default::default()
-    });
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
-            color: Color::BLACK,
+        })
+        .insert(Persistent);
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
+                color: Color::BLACK,
+                ..Default::default()
+            },
+            transform: Transform::from_xyz(0., DESIRED_SIZE.y * 0.5 + RATIO_BAR_SIZE * 0.5, 1.),
             ..Default::default()
-        },
-        transform: Transform::from_xyz(0., DESIRED_SIZE.y * 0.5 + RATIO_BAR_SIZE * 0.5, 1.),
-        ..Default::default()
-    });
-    commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
-            color: Color::BLACK,
+        })
+        .insert(Persistent);
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
+                color: Color::BLACK,
+                ..Default::default()
+            },
+            transform: Transform::from_xyz(0., DESIRED_SIZE.y * -0.5 - RATIO_BAR_SIZE * 0.5, 1.),
             ..Default::default()
-        },
-        transform: Transform::from_xyz(0., DESIRED_SIZE.y * -0.5 - RATIO_BAR_SIZE * 0.5, 1.),
-        ..Default::default()
-    });
+        })
+        .insert(Persistent);
 }
 
 fn force_camera_ratio(windows: Res<Windows>, mut query: Query<&mut Transform, With<Camera>>) {

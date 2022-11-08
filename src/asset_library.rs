@@ -66,6 +66,8 @@ pub struct SpineAssets {
     pub customer: Handle<SkeletonData>,
     #[spine_asset("spines/health")]
     pub health: Handle<SkeletonData>,
+    #[spine_asset("spines/menu")]
+    pub menu: Handle<SkeletonData>,
 
     #[spine_asset("spines/products/ak47")]
     pub product_ak47: Handle<SkeletonData>,

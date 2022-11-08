@@ -1,8 +1,8 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
 use super::{
-    ForceCameraRatioPlugin, GameInputPlugin, InteractablePlugin, SpineSync2Plugin,
-    Transform2Plugin, VersionPlugin,
+    ClearScenePlugin, ForceCameraRatioPlugin, GameInputPlugin, InteractablePlugin,
+    SpineSync2Plugin, Transform2Plugin, VersionPlugin,
 };
 
 pub struct CommonPlugins;
@@ -15,5 +15,6 @@ impl PluginGroup for CommonPlugins {
         group.add(InteractablePlugin);
         group.add(GameInputPlugin);
         group.add(VersionPlugin);
+        group.add(ClearScenePlugin);
     }
 }

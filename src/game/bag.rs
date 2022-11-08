@@ -28,7 +28,7 @@ pub struct BagPlugin;
 impl Plugin for BagPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<BagSpawnEvent>()
-            .add_system(bag_spawn.label(BagSystem::Spawn))
+            .add_system(bag_spawn.label(BagSystem::Spawn).before(SpineSystem::Load))
             .add_system(
                 bag_spawned
                     .label(BagSystem::Spawned)

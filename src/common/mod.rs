@@ -1,4 +1,5 @@
 mod asset_collection;
+mod clear_scene;
 mod collision;
 mod control;
 mod force_camera_ratio;
@@ -9,6 +10,7 @@ mod transform2;
 mod version;
 
 pub use asset_collection::*;
+pub use clear_scene::*;
 pub use collision::*;
 pub use control::*;
 pub use force_camera_ratio::*;

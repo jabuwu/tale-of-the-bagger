@@ -106,7 +106,7 @@ fn product_spawn(
                 let mut y_offset = 0.;
                 for attribute in attributes.enums() {
                     parent
-                        .spawn_bundle(SpriteBundle {
+                        .spawn(SpriteBundle {
                             texture: attribute.icon(asset_library.as_ref()),
                             ..Default::default()
                         })

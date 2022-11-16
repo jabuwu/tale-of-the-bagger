@@ -47,7 +47,7 @@ fn customer_spawn(
 ) {
     for event in spawn_events.iter() {
         commands
-            .spawn_bundle(SpineBundle {
+            .spawn(SpineBundle {
                 skeleton: asset_library.spines.customer.clone(),
                 ..Default::default()
             })

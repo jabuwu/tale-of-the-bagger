@@ -37,7 +37,7 @@ fn product_chicken_spawn(
         if event.kind == ProductKind::Chicken {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_chicken.clone(),
                     ..Default::default()
                 })

@@ -14,38 +14,40 @@ use super::{
 pub struct ProductPlugins;
 
 impl PluginGroup for ProductPlugins {
-    fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(ProductAk47Plugin);
-        group.add(ProductAntifreezePlugin);
-        group.add(ProductAvocadoPlugin);
-        group.add(ProductBaconPlugin);
-        group.add(ProductBatteriesPlugin);
-        group.add(ProductBeansPlugin);
-        group.add(ProductBeerPlugin);
-        group.add(ProductBleachPlugin);
-        group.add(ProductBoilingWaterPlugin);
-        group.add(ProductBowlingBallPlugin);
-        group.add(ProductBreadPlugin);
-        group.add(ProductChickenPlugin);
-        group.add(ProductCinderPlugin);
-        group.add(ProductCocainePlugin);
-        group.add(ProductCoffeePlugin);
-        group.add(ProductEggsPlugin);
-        group.add(ProductGoodStuffPlugin);
-        group.add(ProductHeartPlugin);
-        group.add(ProductIcePlugin);
-        group.add(ProductIceCreamPlugin);
-        group.add(ProductJerkyPlugin);
-        group.add(ProductKatanaPlugin);
-        group.add(ProductKetchupPlugin);
-        group.add(ProductMilkPlugin);
-        group.add(ProductPlatePlugin);
-        group.add(ProductRocketFuelPlugin);
-        group.add(ProductSkullPlugin);
-        group.add(ProductSoupPlugin);
-        group.add(ProductTacoPlugin);
-        group.add(ProductTorchPlugin);
-        group.add(ProductWatermelonPlugin);
-        group.add(ProductXxxPlugin);
+    fn build(self) -> PluginGroupBuilder {
+        let mut group = PluginGroupBuilder::start::<Self>();
+        group = group.add(ProductAk47Plugin);
+        group = group.add(ProductAntifreezePlugin);
+        group = group.add(ProductAvocadoPlugin);
+        group = group.add(ProductBaconPlugin);
+        group = group.add(ProductBatteriesPlugin);
+        group = group.add(ProductBeansPlugin);
+        group = group.add(ProductBeerPlugin);
+        group = group.add(ProductBleachPlugin);
+        group = group.add(ProductBoilingWaterPlugin);
+        group = group.add(ProductBowlingBallPlugin);
+        group = group.add(ProductBreadPlugin);
+        group = group.add(ProductChickenPlugin);
+        group = group.add(ProductCinderPlugin);
+        group = group.add(ProductCocainePlugin);
+        group = group.add(ProductCoffeePlugin);
+        group = group.add(ProductEggsPlugin);
+        group = group.add(ProductGoodStuffPlugin);
+        group = group.add(ProductHeartPlugin);
+        group = group.add(ProductIcePlugin);
+        group = group.add(ProductIceCreamPlugin);
+        group = group.add(ProductJerkyPlugin);
+        group = group.add(ProductKatanaPlugin);
+        group = group.add(ProductKetchupPlugin);
+        group = group.add(ProductMilkPlugin);
+        group = group.add(ProductPlatePlugin);
+        group = group.add(ProductRocketFuelPlugin);
+        group = group.add(ProductSkullPlugin);
+        group = group.add(ProductSoupPlugin);
+        group = group.add(ProductTacoPlugin);
+        group = group.add(ProductTorchPlugin);
+        group = group.add(ProductWatermelonPlugin);
+        group = group.add(ProductXxxPlugin);
+        group
     }
 }

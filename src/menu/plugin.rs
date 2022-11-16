@@ -17,6 +17,6 @@ impl Plugin for MenuStatePlugin {
 }
 
 fn menu_enter(mut commands: Commands, mut menu_spawn_events: EventWriter<MenuSpawnEvent>) {
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
     menu_spawn_events.send_default();
 }

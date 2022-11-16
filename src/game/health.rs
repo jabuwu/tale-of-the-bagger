@@ -29,6 +29,7 @@ impl Plugin for HealthPlugin {
     }
 }
 
+#[derive(Resource)]
 pub struct Health {
     pub amount: u8,
 }
@@ -82,7 +83,7 @@ fn health_icon_spawn(
 ) {
     for event in spawn_events.iter() {
         commands
-            .spawn_bundle(SpineBundle {
+            .spawn(SpineBundle {
                 skeleton: asset_library.spines.health.clone(),
                 ..Default::default()
             })

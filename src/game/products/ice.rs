@@ -37,7 +37,7 @@ fn product_ice_spawn(
         if event.kind == ProductKind::Ice {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_ice.clone(),
                     ..Default::default()
                 })

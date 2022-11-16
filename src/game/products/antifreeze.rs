@@ -37,7 +37,7 @@ fn product_antifreeze_spawn(
         if event.kind == ProductKind::Antifreeze {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_antifreeze.clone(),
                     ..Default::default()
                 })

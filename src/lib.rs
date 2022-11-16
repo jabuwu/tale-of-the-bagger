@@ -40,16 +40,24 @@ pub fn game() {
 
     app.insert_resource(Msaa { samples: 1 })
         .insert_resource(ClearColor(Color::BLACK))
-        .insert_resource(window_descriptor)
         .init_resource::<AssetLibrary>()
         .add_state(AppState::default());
 
     #[cfg(not(feature = "embedded_assets"))]
-    app.add_plugins(DefaultPlugins);
+    app.add_plugins(DefaultPlugins.set(WindowPlugin {
+        window: window_descriptor,
+        ..Default::default()
+    }));
     #[cfg(feature = "embedded_assets")]
-    app.add_plugins_with(DefaultPlugins, |group| {
-        group.add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetIoPlugin)
-    });
+    app.add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                window: window_descriptor,
+                ..Default::default()
+            })
+            .build()
+            .add_before::<bevy::asset::AssetPlugin, _>(EmbeddedAssetIoPlugin),
+    );
 
     app.add_plugins(CommonPlugins)
         .add_plugin(AudioPlugin)

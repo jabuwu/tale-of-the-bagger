@@ -25,20 +25,20 @@ embedded_assets = [
 ]
 
 [dependencies]
-bevy = { version = "0.8", default-features = false, features = ["bevy_asset", "bevy_winit", "render", "png", "x11"] }
-bevy_kira_audio = { version = "0.12" }
+bevy = { version = "0.9", default-features = false, features = ["bevy_asset", "bevy_winit", "render", "png", "x11"] }
+bevy_kira_audio = { version = "0.13" }
 rand = { version = "0.8.3" }
 lerp = { version = "0.4" }
 bitmask-enum = { version = "2.1" }
 strum = { version = "0.24" }
 strum_macros = { version = "0.24" }
 include_dir = { version = "0.7", optional = true }
-bevy_spine = { git = "https://github.com/jabuwu/bevy_spine", rev = "83efea5d12b99547827236af06f8c010e4646ee0" }
+bevy_spine = { version = "0.4" }
 
 tale-of-the-bagger-macros = { path = "./macros" }
 
 # keep the following in sync with Bevy's dependencies
-winit = { version = "0.26.0", default-features = false }
+winit = { version = "0.27.0", default-features = false }
 image = { version = "0.24", default-features = false }
 
 [build-dependencies]

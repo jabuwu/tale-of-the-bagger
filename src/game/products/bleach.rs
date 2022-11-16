@@ -37,7 +37,7 @@ fn product_bleach_spawn(
         if event.kind == ProductKind::Bleach {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_bleach.clone(),
                     ..Default::default()
                 })

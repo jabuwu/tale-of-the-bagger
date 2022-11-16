@@ -37,7 +37,7 @@ fn product_ice_cream_spawn(
         if event.kind == ProductKind::IceCream {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_ice_cream.clone(),
                     ..Default::default()
                 })

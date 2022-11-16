@@ -37,7 +37,7 @@ fn product_bowling_ball_spawn(
         if event.kind == ProductKind::BowlingBall {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_bowling_ball.clone(),
                     ..Default::default()
                 })

@@ -47,7 +47,7 @@ fn product_ketchup_spawn(
         if event.kind == ProductKind::Ketchup {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_ketchup.clone(),
                     ..Default::default()
                 })

@@ -37,7 +37,7 @@ fn product_plate_spawn(
         if event.kind == ProductKind::Plate {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_plate.clone(),
                     ..Default::default()
                 })

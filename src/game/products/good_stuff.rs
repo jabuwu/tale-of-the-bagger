@@ -37,7 +37,7 @@ fn product_good_stuff_spawn(
         if event.kind == ProductKind::GoodStuff {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_good_stuff.clone(),
                     ..Default::default()
                 })

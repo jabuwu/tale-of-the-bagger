@@ -37,7 +37,7 @@ fn product_heart_spawn(
         if event.kind == ProductKind::Heart {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_heart.clone(),
                     ..Default::default()
                 })

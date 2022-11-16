@@ -37,7 +37,7 @@ fn product_bread_spawn(
         if event.kind == ProductKind::Bread {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_bread.clone(),
                     ..Default::default()
                 })

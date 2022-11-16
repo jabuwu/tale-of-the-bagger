@@ -41,10 +41,8 @@ pub struct EmbeddedAssetIoPlugin;
 
 impl Plugin for EmbeddedAssetIoPlugin {
     fn build(&self, app: &mut App) {
-        let asset_io = {
-            let default_io = bevy::asset::create_platform_default_asset_io(app);
-            EmbeddedAssetIo(default_io)
-        };
+        let default_io = AssetPlugin::default().create_platform_default_asset_io();
+        let asset_io = EmbeddedAssetIo(default_io);
         app.insert_resource(AssetServer::new(asset_io));
     }
 }

@@ -37,7 +37,7 @@ fn product_ak47_spawn(
         if event.kind == ProductKind::Ak47 {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_ak47.clone(),
                     ..Default::default()
                 })

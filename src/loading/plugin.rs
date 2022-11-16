@@ -23,7 +23,7 @@ fn loading_enter(
 }
 
 fn loading_update(mut app_state: ResMut<State<AppState>>, time: Res<Time>) {
-    if time.seconds_since_startup() > 0.2 {
+    if time.elapsed_seconds() > 0.2 {
         let _ = app_state.set(AppState::Menu);
     }
 }

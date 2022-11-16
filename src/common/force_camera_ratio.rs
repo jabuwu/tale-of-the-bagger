@@ -23,7 +23,7 @@ impl Plugin for ForceCameraRatioPlugin {
 
 fn force_camera_ratio_setup(mut commands: Commands) {
     commands
-        .spawn_bundle(SpriteBundle {
+        .spawn(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
                 color: Color::BLACK,
@@ -34,7 +34,7 @@ fn force_camera_ratio_setup(mut commands: Commands) {
         })
         .insert(Persistent);
     commands
-        .spawn_bundle(SpriteBundle {
+        .spawn(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
                 color: Color::BLACK,
@@ -45,7 +45,7 @@ fn force_camera_ratio_setup(mut commands: Commands) {
         })
         .insert(Persistent);
     commands
-        .spawn_bundle(SpriteBundle {
+        .spawn(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
                 color: Color::BLACK,
@@ -56,7 +56,7 @@ fn force_camera_ratio_setup(mut commands: Commands) {
         })
         .insert(Persistent);
     commands
-        .spawn_bundle(SpriteBundle {
+        .spawn(SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::splat(RATIO_BAR_SIZE)),
                 color: Color::BLACK,

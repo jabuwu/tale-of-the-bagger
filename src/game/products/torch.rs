@@ -37,7 +37,7 @@ fn product_torch_spawn(
         if event.kind == ProductKind::Torch {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_torch.clone(),
                     ..Default::default()
                 })

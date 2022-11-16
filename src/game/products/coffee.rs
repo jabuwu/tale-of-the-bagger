@@ -37,7 +37,7 @@ fn product_coffee_spawn(
         if event.kind == ProductKind::Coffee {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_coffee.clone(),
                     ..Default::default()
                 })

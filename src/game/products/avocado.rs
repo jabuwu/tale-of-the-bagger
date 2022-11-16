@@ -37,7 +37,7 @@ fn product_avocado_spawn(
         if event.kind == ProductKind::Avocado {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_avocado.clone(),
                     ..Default::default()
                 })

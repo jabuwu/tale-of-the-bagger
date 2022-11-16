@@ -37,7 +37,7 @@ fn product_taco_spawn(
         if event.kind == ProductKind::Taco {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_taco.clone(),
                     ..Default::default()
                 })

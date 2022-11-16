@@ -37,7 +37,7 @@ fn product_boiling_water_spawn(
         if event.kind == ProductKind::BoilingWater {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_boiling_water.clone(),
                     ..Default::default()
                 })

@@ -43,17 +43,17 @@ fn game_enter(
     mut health_spawn_events: EventWriter<HealthIconSpawnEvent>,
     asset_library: Res<AssetLibrary>,
 ) {
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     commands
-        .spawn_bundle(SpriteBundle {
+        .spawn(SpriteBundle {
             texture: asset_library.textures.background.clone(),
             ..Default::default()
         })
         .insert(Transform2::from_xy(0., 0.))
         .insert(DEPTH_BACKGROUND);
     commands
-        .spawn_bundle(SpriteBundle {
+        .spawn(SpriteBundle {
             texture: asset_library.textures.background_front.clone(),
             ..Default::default()
         })
@@ -131,7 +131,7 @@ fn game_spawn_products(
     local.spawn_time -= time.delta_seconds();
     if local.spawn_time <= 0. {
         product_spawn_events.send(ProductSpawnEvent {
-            entity: commands.spawn().id(),
+            entity: commands.spawn_empty().id(),
             position: Vec2::new(-2000., -100.),
             kind: ProductKind::iter().choose(&mut thread_rng()).unwrap(),
         });

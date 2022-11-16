@@ -4,7 +4,7 @@ use bevy_spine::prelude::*;
 
 use crate::common::AssetCollection;
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 pub struct AssetLibrary {
     pub textures: TextureAssets,
     pub fonts: FontAssets,

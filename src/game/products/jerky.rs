@@ -49,7 +49,7 @@ fn product_jerky_spawn(
         if event.kind == ProductKind::Jerky {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_jerky.clone(),
                     ..Default::default()
                 })

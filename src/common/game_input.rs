@@ -9,7 +9,7 @@ impl Plugin for GameInputPlugin {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 pub struct GameInput {
     drag_id: u64,
     cursor_position: Option<Vec2>,

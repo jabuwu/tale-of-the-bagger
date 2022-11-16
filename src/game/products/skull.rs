@@ -37,7 +37,7 @@ fn product_skull_spawn(
         if event.kind == ProductKind::Skull {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_skull.clone(),
                     ..Default::default()
                 })

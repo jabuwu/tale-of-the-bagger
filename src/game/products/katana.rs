@@ -37,7 +37,7 @@ fn product_katana_spawn(
         if event.kind == ProductKind::Katana {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_katana.clone(),
                     ..Default::default()
                 })

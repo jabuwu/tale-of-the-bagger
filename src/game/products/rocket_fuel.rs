@@ -37,7 +37,7 @@ fn product_rocket_fuel_spawn(
         if event.kind == ProductKind::RocketFuel {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_rocket_fuel.clone(),
                     ..Default::default()
                 })

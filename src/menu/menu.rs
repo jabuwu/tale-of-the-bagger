@@ -50,7 +50,7 @@ fn menu_spawn(
 ) {
     for _ in spawn_events.iter() {
         commands
-            .spawn_bundle(SpineBundle {
+            .spawn(SpineBundle {
                 skeleton: asset_library.spines.menu.clone(),
                 ..Default::default()
             })
@@ -87,7 +87,7 @@ fn menu_spawned(
                     )
                     .unwrap();
                     parent
-                        .spawn_bundle(TransformBundle::default())
+                        .spawn(TransformBundle::default())
                         .insert(Transform2::from_translation(bounds.translation))
                         .insert(Interactable::new(
                             CollisionShape::Aabb {

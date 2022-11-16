@@ -41,7 +41,7 @@ fn desk_spawn(
 ) {
     for _ in spawn_events.iter() {
         commands
-            .spawn_bundle(SpineBundle {
+            .spawn(SpineBundle {
                 skeleton: asset_library.spines.desk.clone(),
                 ..Default::default()
             })

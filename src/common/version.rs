@@ -29,14 +29,14 @@ fn version_spawn(
 ) {
     for _ in spawn_events.iter() {
         commands
-            .spawn_bundle(VisibilityBundle::default())
-            .insert_bundle(TransformBundle {
+            .spawn(VisibilityBundle::default())
+            .insert(TransformBundle {
                 local: Transform::from_xyz(950., -530., 0.99),
                 ..Default::default()
             })
             .insert(Version)
             .with_children(|parent| {
-                parent.spawn_bundle(Text2dBundle {
+                parent.spawn(Text2dBundle {
                     transform: Transform::from_xyz(0., 0., 0.001),
                     text: Text::from_section(
                         env!("CARGO_PKG_VERSION"),
@@ -52,7 +52,7 @@ fn version_spawn(
                     }),
                     ..Default::default()
                 });
-                parent.spawn_bundle(Text2dBundle {
+                parent.spawn(Text2dBundle {
                     transform: Transform::from_xyz(2., -2., 0.),
                     text: Text::from_section(
                         env!("CARGO_PKG_VERSION"),

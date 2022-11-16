@@ -37,7 +37,7 @@ fn product_beer_spawn(
         if event.kind == ProductKind::Beer {
             commands
                 .entity(event.entity)
-                .insert_bundle(SpineBundle {
+                .insert(SpineBundle {
                     skeleton: asset_library.spines.product_beer.clone(),
                     ..Default::default()
                 })
